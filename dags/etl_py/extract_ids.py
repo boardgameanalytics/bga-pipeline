@@ -14,7 +14,8 @@ def main(dest: str):
 
     # Extract from @beefsack's historical rankings repo
     file_date = date.today().strftime("%Y-%m-%d") # YYYY-MM-DD
-    url = f'https://raw.githubusercontent.com/beefsack/bgg-ranking-historicals/master/{file_date}.csv'
+    url = f'https://raw.githubusercontent.com/beefsack/\
+        bgg-ranking-historicals/master/{file_date}.csv'
 
     # Fetch latest rankings from github
     res = requests.get(url)
@@ -23,7 +24,7 @@ def main(dest: str):
     raw_data = StringIO(res.content.decode('utf-8'))
 
     # Load raw data into DataFrame
-    df = pd.read_csv(raw_data, header=0, sep=',')
+    raw_df = pd.read_csv(raw_data, header=0, sep=',')
 
     # Save IDs to file
-    df['ID'].to_csv(dest, header=None, index=None)
+    raw_df['ID'].to_csv(dest, header=None, index=None)

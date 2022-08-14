@@ -69,13 +69,3 @@ You may modify existing connections/variables, or add new ones in these files:
 - `airflow_variables.json`
 
 *WARNING: Changing existing variable or connection entries may cause unexpected behavior!*
-
-## Load Method
-
-There are two methods of loading the data into the database provided in `bgg_pipeline_dag.py`:
-
-1. PostgresOperator Method: Uses the COPY command in postgres to natively load the csv files.\
-   This requires elevated permissions for the database user, and is not always available.
-
-2. PythonOperator Method: Uses Pandas DataFrames and SQLAlchemy to load the data.\
-   This should be used only if the above method is not available.

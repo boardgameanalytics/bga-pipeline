@@ -94,37 +94,25 @@ def main(xml_dir: str, csv_dir: str):
                 data.append(transform_class_map(name, game_soup))
 
 
-    ## Merge dataframes ##
-
-    games = pd.concat(games)
-    game_desc = pd.concat(game_desc)
-
-    # classification data
-    for name, dfs in classifications.items():
-        classifications['name'] = pd.concat(dfs)
-
-    # game-classification relationships
-    for name, dfs in class_maps.items():
-        classifications['name'] = pd.concat(dfs)
-
-
-    ## Data cleaning ##
+    ## Merge and clean game_descriptions
     def clean_description(text: str):
         text = re.sub(r'&rsquo;', '\'', text)
         text = re.sub(r'&#.{,5};', ' ', text)
         text = re.sub(r' {2,}', ' ', text)
         return text.strip()
+
+    game_desc = pd.concat(game_desc)
     game_desc['description'].apply(clean_description)
 
 
     ## Save to csv ##
-    save_df(games, 'game', csv_dir)
+    save_df(pd.concat(games), 'game', csv_dir)
     save_df(game_desc, 'game_description', csv_dir)
 
     # classification data
-    for name, df in classifications.items():
-        save_df(df, name, csv_dir)
+    for name, dfs in classifications.items():
+        save_df(pd.concat(dfs), name, csv_dir)
 
     # game-classification relationships
-    for name, df in class_maps.items():
-        save_df(df, f'game_{name}', csv_dir)
+    for name, dfs in class_maps.items():
+        save_df(pd.concat(dfs), f'game_{name}', csv_dir)

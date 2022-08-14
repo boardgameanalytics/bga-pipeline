@@ -6,14 +6,14 @@ from datetime import datetime, timedelta
 from airflow import DAG
 from airflow.models import Variable
 from airflow.models.baseoperator import chain
-# from airflow.hooks.base_hook import BaseHook
+from airflow.hooks.base_hook import BaseHook
 from airflow.operators.python import PythonOperator
 from airflow.operators.sql import SQLCheckOperator
 from airflow.providers.http.sensors.http import HttpSensor
 from airflow.providers.postgres.operators.postgres import PostgresOperator
 
 sys.path.append("/opt/airflow/dag/etl_py")
-from etl_py import extract_ids, extract_xml, transform_xml #, load_csv
+from etl_py import extract_ids, extract_xml, transform_xml, load
 
 # Grab current date
 current_date = datetime.today().strftime('%Y-%m-%d')
@@ -30,7 +30,7 @@ default_args = {
 
 
 DB_CONN_ID = Variable.get('db_conn_id') # 'postgres_db'
-BATCH_SIZE = Variable.get('batch_size') # 1200
+BATCH_SIZE = int(Variable.get('batch_size')) # 1200
 XML_PATH = Variable.get('xml_path') # 'data/xml'
 CSV_PATH = Variable.get('csv_path') # 'data/csv'
 GAME_IDS_FILE = Variable.get('game_ids_file') # 'data/game_ids.csv'
@@ -91,22 +91,14 @@ with DAG('bgg_pipeline',
     )
 
     # Load data to db
-    # Use this to natively copy csv file if you have permissions to do so.
-    load_data = PostgresOperator(
+    load_data = PythonOperator(
         task_id = 'load_data',
-        postgres_conn_id=DB_CONN_ID,
-        sql='sql/load_csv.sql'
+        python_callable=load.main,
+        op_kwargs={
+            'csv_dir': CSV_PATH,
+            'conn_str': BaseHook.get_connection(DB_CONN_ID).get_uri()
+        }
     )
-
-    # Load db using pandas and sqlalchemy conn (if unable to use copy)
-    # load_data = PythonOperator(
-    #     task_id = 'load_data',
-    #     python_callable=load_csv.load_tables,
-    #     op_kwargs={
-    #         'csv_dir': CSV_PATH,
-    #         'conn_str': BaseHook.get_connection(DB_CONN_ID).get_uri()
-    #     }
-    # )
 
     # Validate
     validate_table_game = SQLCheckOperator(
