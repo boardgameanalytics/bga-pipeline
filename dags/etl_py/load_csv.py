@@ -39,8 +39,6 @@ def load_tables(csv_dir: str, db_conn_str: str) -> None:
     csv_filenames.sort(key=len)
 
     for filename in csv_filenames:
-        if filename == 'game_description.csv':
-            continue # Skip loading game_description
         filepath = f'{csv_dir}/{filename}'
         tablename = filename.split('.')[0]
         to_table(filepath, tablename, db_conn_str)
