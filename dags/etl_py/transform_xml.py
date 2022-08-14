@@ -102,7 +102,7 @@ def main(xml_dir: str, csv_dir: str):
         return text.strip()
 
     game_desc = pd.concat(game_desc)
-    game_desc['description'].apply(clean_description)
+    game_desc['description'] = game_desc['description'].apply(clean_description)
 
 
     ## Save to csv ##

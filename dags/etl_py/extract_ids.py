@@ -14,8 +14,8 @@ def main(dest: str):
 
     # Extract from @beefsack's historical rankings repo
     file_date = date.today().strftime("%Y-%m-%d") # YYYY-MM-DD
-    url = f'https://raw.githubusercontent.com/beefsack/\
-        bgg-ranking-historicals/master/{file_date}.csv'
+    file_date = "2022-08-13" # Last known good file
+    url = f'https://raw.githubusercontent.com/beefsack/bgg-ranking-historicals/master/{file_date}.csv'
 
     # Fetch latest rankings from github
     res = requests.get(url)
