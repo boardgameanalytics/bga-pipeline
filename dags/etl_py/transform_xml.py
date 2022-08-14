@@ -7,8 +7,8 @@ from bs4 import BeautifulSoup
 
 
 def transform_game_data(game_soup: BeautifulSoup) -> pd.DataFrame:
-    '''Transform game data from XML fragment to dict'''
-    
+    '''Transform game data from XML fragment to df'''
+
     raw = {
         'id': [int(game_soup.attrs['id'])],
         'title': [game_soup.find('name').attrs['value']],
@@ -28,16 +28,17 @@ def transform_game_data(game_soup: BeautifulSoup) -> pd.DataFrame:
     return pd.DataFrame.from_dict(raw)
 
 def transform_game_desc(game_soup: BeautifulSoup) -> pd.DataFrame:
+    '''Transform game descriptions to df'''
     raw = {
         'game_id': [int(game_soup.attrs['id'])],
         'description': [str(game_soup.find('description').string)]
     }
-    
+
     return pd.DataFrame.from_dict(raw)
 
 def transform_game_classification(name: str, game_soup: BeautifulSoup) -> pd.DataFrame:
-    '''Transform given classification ids from game's XML fragment to list'''
-    
+    '''Transform given classification ids from game's XML fragment to df'''
+
     raw = [(int(line.attrs['id']), str(line.attrs['value']))
             for line in game_soup.find_all('link', type=f'boardgame{name}')]
 
@@ -52,7 +53,7 @@ def transform_class_map(name: str, game_soup: BeautifulSoup) -> pd.DataFrame:
 
 
 def save_df(dataframe: pd.DataFrame, name: str, csv_dir: str) -> None:
-    '''Consolidate list and save df to csv'''
+    '''Deduplicate and save df to csv'''
     with open(f'{csv_dir}/{name}.csv', 'w', encoding='utf-8') as file:
         dataframe.drop_duplicates().to_csv(file, index=False)
 
@@ -72,7 +73,7 @@ def main(xml_dir: str, csv_dir: str):
 
 
     ## Transform xml to pandas dataframe ##
-    
+
     # Iterate through all xml batch files
     for filename in xml_files:
         # Load xml file
@@ -94,10 +95,10 @@ def main(xml_dir: str, csv_dir: str):
 
 
     ## Merge dataframes ##
-    
+
     games = pd.concat(games)
     game_desc = pd.concat(game_desc)
-    
+
     # classification data
     for name, dfs in classifications.items():
         classifications['name'] = pd.concat(dfs)

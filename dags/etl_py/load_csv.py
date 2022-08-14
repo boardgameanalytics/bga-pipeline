@@ -4,21 +4,18 @@ from os import listdir
 import pandas as pd
 from sqlalchemy import create_engine
 
-def to_table(filepath, table, pg_conn_string):
-    """
-    Loads a pandas DataFrame to a bit.io database.
-    Parameters
-    ----------
-    df : pandas.DataFrame
-    destination : str
-        Fully qualified bit.io PostgreSQL table name.
-    pg_conn_string : str
-        A bit.io PostgreSQL connection string including credentials.
+def to_table(filepath: str, table: str, db_conn_str: str) -> None:
+    """Load csv file to sql table
+
+    Args:
+        filepath (str): csv file location
+        table (str): Table name to save file to
+        db_conn_str (str): DB connection URI string with credentials
     """
     # Validation and setup
-    if pg_conn_string is None:
+    if db_conn_str is None:
         raise ValueError("You must specify a PG connection string.")
-    engine = create_engine(pg_conn_string)
+    engine = create_engine(db_conn_str)
 
     df = pd.read_csv(filepath, header=0)
 
@@ -29,12 +26,12 @@ def to_table(filepath, table, pg_conn_string):
         index=False,
     )
 
-def load_tables(csv_dir: str, conn_str: str):
+def load_tables(csv_dir: str, db_conn_str: str) -> None:
     """Load all csv files to tables
 
     Args:
-        csv_dir (str): _description_
-        pg_conn_string (_type_): _description_
+        csv_dir (str): Location directory containing csv files
+        db_conn_str (str): DB connection URI string with credentials
     """
     csv_filenames = [file for file in listdir(csv_dir) if file[-4:] == '.csv']
 
@@ -46,4 +43,4 @@ def load_tables(csv_dir: str, conn_str: str):
             continue # Skip loading game_description
         filepath = f'{csv_dir}/{filename}'
         tablename = filename.split('.')[0]
-        to_table(filepath, tablename, conn_str)
+        to_table(filepath, tablename, db_conn_str)
