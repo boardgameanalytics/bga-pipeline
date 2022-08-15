@@ -1,7 +1,7 @@
 # Boardgame Project ETL Pipeline
 
-![flake8](https://github.com/randynobx/boardgamegeek-pipeline/actions/workflows/flake8.yml/badge.svg?event=push)
-![pytest](https://github.com/randynobx/boardgamegeek-pipeline/actions/workflows/pytest.yml/badge.svg?event=push)
+![flake8](https://github.com/randynobx/boardgame-pipeline/actions/workflows/flake8.yml/badge.svg?event=push)
+![pytest](https://github.com/randynobx/boardgame-pipeline/actions/workflows/pytest.yml/badge.svg?event=push)
 
 A fully automated ETL pipeline using Apache Airflow, BeautifulSoup4, and Pandas to create a data warehouse of board game data from [BoardGameGeek.com](https://boardgamegeek.com/) using their [BGGXMLAPI2](https://boardgamegeek.com/wiki/page/BGG_XML_API2).
 
