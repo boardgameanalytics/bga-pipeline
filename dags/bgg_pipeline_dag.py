@@ -112,7 +112,7 @@ with DAG('bgg_pipeline',
     # Dependencies
     chain(
         is_api_available,
-        extract_ids,
+        extract_game_ids,
         extract_data,
         transform_data,
         create_staging_tables,
