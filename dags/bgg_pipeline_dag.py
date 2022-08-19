@@ -13,7 +13,7 @@ from airflow.providers.http.sensors.http import HttpSensor
 from airflow.providers.postgres.operators.postgres import PostgresOperator
 
 sys.path.append("/opt/airflow/dag/etl_py")
-from etl_py import extract_ids, extract_xml, transform_xml, load
+from etl_py import extract_game_ids, extract_xml, transform_xml, load
 
 # Grab current date
 current_date = datetime.today().strftime('%Y-%m-%d')
@@ -54,9 +54,9 @@ with DAG('bgg_pipeline',
     )
 
     # Extract game IDs
-    extract_ids = PythonOperator(
-        task_id='extract_ids',
-        python_callable=extract_ids.main,
+    extract_game_ids = PythonOperator(
+        task_id='extract_game_ids',
+        python_callable=extract_game_ids.main,
         op_kwargs={
             'dest': GAME_IDS_FILE
         }
