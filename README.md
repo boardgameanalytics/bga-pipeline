@@ -23,6 +23,15 @@ Clone this repo to where you want the Docker Environment to run out of:
 git clone git@github.com:randynobx/boardgamegeek_pipeline.git
 ```
 
+## Create .env
+Create a `.env` file in the project directory and add your BGG login credentials
+(for getting game ids) as:
+
+```
+BGG_USERNAME="your_username"
+BGG_PASSWORD="*************"
+```
+
 ## Setup Docker Environment
 Build the custom `bgg-airflow` docker image:
 ```

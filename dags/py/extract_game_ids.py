@@ -1,6 +1,5 @@
 """Extract game IDs for all ranked games on BoardGameGeek.com"""
 
-from collections.abc import Generator
 import re
 from time import sleep
 import requests
@@ -51,9 +50,11 @@ def extract_ranked_game_ids(text: str) -> list:
         list of game id's
     '''
     soup = BeautifulSoup(text, features='html')
-    def _extract(soup: BeautifulSoup) -> Generator[list]:
+    def _extract(soup: BeautifulSoup):
         for row in soup.find_all(id="row_"):
-            if rank := row.find(class_='collection_rank'):
+            #if rank := row.find(class_='collection_rank'):
+            rank = row.find(class_='collection_rank')
+            if rank is not None:
                 if rank.a:
                     text = row.find(class_='primary').attrs['href']
                     yield re.search(r'/boardgame/(\d+)/', text).group(1)
@@ -61,7 +62,7 @@ def extract_ranked_game_ids(text: str) -> list:
     return list(_extract(soup))
 
 
-def scrape_browse_pages() -> Generator[list]:
+def scrape_browse_pages():
     """Extract game ids of all ranked games on BGG
 
     Returns:
@@ -83,7 +84,9 @@ def scrape_browse_pages() -> Generator[list]:
         # Check that page was loaded successfully
         if res.status_code == 200:
             # Check that game ids were found on page
-            if new_ids := extract_ranked_game_ids(res.content.decode()):
+            #if new_ids := extract_ranked_game_ids(res.content.decode()):
+            new_ids = extract_ranked_game_ids(res.content.decode())
+            if new_ids is not None:
                 print(page_num, end='')
                 yield new_ids # Yield list of current pages id
                 sleep(WAIT_TIME) # Pause between pages to reduce request freq

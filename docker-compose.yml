@@ -67,6 +67,7 @@ x-airflow-common:
     - ./plugins:/opt/airflow/plugins
     - ./configs:/opt/airflow/configs
     - ./data:/opt/airflow/data
+    - ./.env:/opt/airflow/.env
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
     &airflow-common-depends-on

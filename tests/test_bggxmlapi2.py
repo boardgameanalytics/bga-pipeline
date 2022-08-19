@@ -5,8 +5,7 @@ import sys
 import re
 from requests import Response
 sys.path.insert(0, os.path.join(os.getcwd(), 'dags'))
-print(sys.path)
-from etl_py import bggxmlapi2 as api
+from py import bggxmlapi2 as api
 
 
 def test_build_query():

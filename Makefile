@@ -12,7 +12,7 @@ down:
 	docker compose --project-name bgg-airflow down
 
 clean-docker:
-	docker compose down --volumes --rmi all --project-name bgg-airflow
+	docker compose --project-name bgg-airflow down --volumes --rmi all 
 
 clean-data:
 	rm -rf data

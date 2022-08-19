@@ -6,7 +6,7 @@ Takes bgg game ids and generates batched xml files
 import os
 from math import ceil
 from requests import Response
-from etl_py.bggxmlapi2 import fetch_game
+from py.bggxmlapi2 import fetch_game
 
 def save_file(path: str, filename: str, content: bytearray) -> None:
     '''Save page to file

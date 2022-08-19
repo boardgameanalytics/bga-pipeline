@@ -12,8 +12,8 @@ from airflow.operators.sql import SQLCheckOperator
 from airflow.providers.http.sensors.http import HttpSensor
 from airflow.providers.postgres.operators.postgres import PostgresOperator
 
-sys.path.append("/opt/airflow/dag/etl_py")
-from etl_py import extract_game_ids, extract_xml, transform_xml, load
+sys.path.append("/opt/airflow/dag/py")
+from py import extract_game_ids, extract_xml, transform_xml, load
 
 # Grab current date
 current_date = datetime.today().strftime('%Y-%m-%d')
@@ -21,11 +21,12 @@ current_date = datetime.today().strftime('%Y-%m-%d')
 # Default settings for all the dags in the pipeline
 default_args = {
 
-    "owner": "Airflow",
+    "owner": "airflow",
     "start_date" : current_date,
     "retries" : 1,
-    "retry_delay": timedelta(minutes=5)
-
+    "retry_delay" : timedelta(minutes=5),
+    "description" : "Automated ETL pipeline for extracting BGG.com data using \
+        the BGGXMLAPI2 REST API."
 }
 
 
@@ -38,7 +39,7 @@ GAME_IDS_FILE = Variable.get('game_ids_file') # 'data/game_ids.csv'
 
 with DAG('bgg_pipeline',
          default_args=default_args,
-         schedule_interval='00 5 * * *',
+         schedule_interval='00 0 * * *',
          catchup=False
          ) as dag:
 
