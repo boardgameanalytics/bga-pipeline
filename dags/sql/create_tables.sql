@@ -24,8 +24,10 @@ CREATE TABLE game (
     max_players     int,
     min_playtime    int,
     max_playtime    int,
+    min_age         int,
     weight          real,
-    owned_copies    int
+    owned_copies    int,
+    wishlist        int
 );
 
 CREATE TABLE mechanic (

@@ -23,8 +23,10 @@ def transform_game_data(game_soup: BeautifulSoup) -> pd.DataFrame:
         'max_players': [int(game_soup.maxplayers.attrs['value'])],
         'min_playtime': [int(game_soup.minplaytime.attrs['value'])],
         'max_playtime': [int(game_soup.maxplaytime.attrs['value'])],
+        'min_age': [int(game_soup.find('minage').attrs['value'])],
         'weight': [float(game_soup.find('averageweight').attrs['value'])],
-        'owned_copies': [int(game_soup.find('owned').attrs['value'])]
+        'owned_copies': [int(game_soup.find('owned').attrs['value'])],
+        'wishlist': [int(game_soup.find('wishing').attrs['value'])]
     }
 
     return pd.DataFrame.from_dict(raw)
