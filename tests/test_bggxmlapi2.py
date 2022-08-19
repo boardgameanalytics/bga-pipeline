@@ -1,11 +1,8 @@
 '''Tests for BoardGameGeek XMLAPI2 helper functions'''
 
-import os
-import sys
 import re
 from requests import Response
-sys.path.insert(0, os.path.join(os.getcwd(), 'dags'))
-from py import bggxmlapi2 as api
+from dags.py import bggxmlapi2 as api
 
 
 def test_build_query():
