@@ -28,7 +28,7 @@ CREATE TABLE game (
     weight          real,
     owned_copies    int,
     wishlist        int,
-    kickstarer      int
+    kickstarter     int
 );
 
 CREATE TABLE mechanic (
