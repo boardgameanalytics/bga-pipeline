@@ -49,7 +49,7 @@ def extract_ranked_game_ids(text: str) -> list:
     Returns:
         list of game id's
     """
-    soup = BeautifulSoup(text, features='html')
+    soup = BeautifulSoup(text, features='html.parser')
     def _extract(soup: BeautifulSoup):
         for row in soup.find_all(id="row_"):
             #if rank := row.find(class_='collection_rank'):
@@ -70,12 +70,13 @@ def scrape_browse_pages():
     """
 
     # Create authenticated session
-    print('Authenticating...', sep='')
+    print('Authenticating...')
     creds = dotenv_values('.env')
     username, password = creds['BGG_USERNAME'], creds['BGG_PASSWORD']
     session = authenticate(username, password)
-    print('Successful. Beginning scrape...')
+    print('Authentication Successful.')
 
+    print('Beginning scrape...')
     # Iterate through browse pages 1+ until no more ids are returned
     for page_num in range(1, MAX_PAGE_NUM):
         url = f'https://boardgamegeek.com/browse/boardgame/page/{page_num}?sort=rank&sortdir=asc'

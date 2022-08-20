@@ -48,18 +48,18 @@ def transform_game_desc(game_soup: BeautifulSoup) -> pd.DataFrame:
     Returns:
         pd.DataFrame: Game description as Pandas DataFrame
     """
-    raw = {
-        'game_id': [int(game_soup.attrs['id'])],
-        'description': [str(game_soup.find('description').string)]
-    }
-
     def clean_description(text: str):
         text = re.sub(r'&rsquo;', '\'', text)
         text = re.sub(r'&#.{,5};', ' ', text)
         text = re.sub(r' {2,}', ' ', text)
         return text.strip()
 
-    raw['description'] = clean_description(raw['description'])
+    desc = clean_description(str(game_soup.find('description').string))
+
+    raw = {
+        'game_id': [int(game_soup.attrs['id'])],
+        'description': [desc]
+    }
 
     return pd.DataFrame.from_dict(raw)
 
