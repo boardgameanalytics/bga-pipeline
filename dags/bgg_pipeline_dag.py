@@ -37,9 +37,9 @@ CSV_PATH = Variable.get('csv_path') # 'data/csv'
 GAME_IDS_FILE = Variable.get('game_ids_file') # 'data/game_ids.csv'
 
 
-with DAG('bgg_pipeline',
+with DAG(dag_id='bgg_pipeline',
          default_args=default_args,
-         schedule_interval='00 0 * * *',
+         schedule_interval='00 4 * * *',
          catchup=False
          ) as dag:
 

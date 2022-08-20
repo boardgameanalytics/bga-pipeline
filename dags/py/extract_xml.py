@@ -8,18 +8,18 @@ from math import ceil
 from requests import Response
 from py.bggxmlapi2 import fetch_game
 
-def save_file(path: str, filename: str, content: bytearray) -> None:
+def save_file(path: str, filename: str, content: str) -> None:
     '''Save page to file
 
     Args:
         path (str): path to file location
         filename (str): name of file, with file extension
-        content (bytearray): raw object or encoded str to write to file
+        content (str): raw str to write to file
     '''
     filepath = f'{path}/{filename}'
     if not os.path.exists(path):
         os.makedirs(path)
-    with open(filepath, 'wb') as file:
+    with open(filepath, 'w', encoding='utf-8') as file:
         file.write(content)
 
 def scrape_game_pages(game_ids_list: list, batch_size: int) -> Response:
@@ -55,4 +55,4 @@ def main(game_ids_file: str, dest_path: str, batch_size: int) -> None:
     # Scrape game data in batches
     for num, page in enumerate(scrape_game_pages(game_ids, batch_size)):
         batch_filename = f'bgg_games_batch_{str(num).zfill(2)}.xml'
-        save_file(dest_path, batch_filename, page.content)
+        save_file(dest_path, batch_filename, page)
