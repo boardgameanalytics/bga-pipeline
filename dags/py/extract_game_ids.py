@@ -37,7 +37,7 @@ def authenticate(username: str, password: str) -> requests.Session:
 
 
 def extract_ranked_game_ids(text: str) -> list:
-    '''Extract game id's from webpage
+    """Extract game id's from webpage
 
     Takes a BGG browse games html page as a string, and extracts game ids from
     all rows that have a numerical ranking. Non ranked games have a ranking of
@@ -48,7 +48,7 @@ def extract_ranked_game_ids(text: str) -> list:
 
     Returns:
         list of game id's
-    '''
+    """
     soup = BeautifulSoup(text, features='html')
     def _extract(soup: BeautifulSoup):
         for row in soup.find_all(id="row_"):

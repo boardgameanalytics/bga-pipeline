@@ -1,4 +1,4 @@
-'''ETL Pipeline for game batch XML -> csv'''
+"""ETL Pipeline for game batch XML -> csv"""
 
 import re
 from os import listdir
@@ -9,7 +9,14 @@ CLASS_TYPES = ['mechanic', 'category', 'designer', 'artist', 'publisher']
 
 
 def transform_game_data(game_soup: BeautifulSoup) -> pd.DataFrame:
-    '''Transform game data from XML fragment to df'''
+    """Transform game data from XML fragment to df
+
+    Args:
+        game_soup (BeautifulSoup): Game data as BeautifulSoup obj
+
+    Returns:
+        pd.DataFrame: Game data as Pandas DataFrame
+    """
 
     raw = {
         'id': [int(game_soup.attrs['id'])],
@@ -26,13 +33,21 @@ def transform_game_data(game_soup: BeautifulSoup) -> pd.DataFrame:
         'min_age': [int(game_soup.find('minage').attrs['value'])],
         'weight': [float(game_soup.find('averageweight').attrs['value'])],
         'owned_copies': [int(game_soup.find('owned').attrs['value'])],
-        'wishlist': [int(game_soup.find('wishing').attrs['value'])]
+        'wishlist': [int(game_soup.find('wishing').attrs['value'])],
+        'kickstarter': [int(bool(game_soup.find('link', id=8374)))]
     }
 
     return pd.DataFrame.from_dict(raw)
 
 def transform_game_desc(game_soup: BeautifulSoup) -> pd.DataFrame:
-    '''Transform game descriptions to df'''
+    """Transform game descriptions to df
+
+    Args:
+        game_soup (BeautifulSoup): Game data as BeautifulSoup obj
+
+    Returns:
+        pd.DataFrame: Game description as Pandas DataFrame
+    """
     raw = {
         'game_id': [int(game_soup.attrs['id'])],
         'description': [str(game_soup.find('description').string)]
@@ -49,7 +64,14 @@ def transform_game_desc(game_soup: BeautifulSoup) -> pd.DataFrame:
     return pd.DataFrame.from_dict(raw)
 
 def transform_game_classification(name: str, game_soup: BeautifulSoup) -> pd.DataFrame:
-    '''Transform given classification ids from game's XML fragment to df'''
+    """Transform given classification ids from game's XML fragment to df
+
+    Args:
+        game_soup (BeautifulSoup): Game data as BeautifulSoup obj
+
+    Returns:
+        pd.DataFrame: Game classification data as Pandas DataFrame
+    """
 
     raw = [(int(line.attrs['id']), str(line.attrs['value']))
             for line in game_soup.find_all('link', type=f'boardgame{name}')]
@@ -58,20 +80,38 @@ def transform_game_classification(name: str, game_soup: BeautifulSoup) -> pd.Dat
 
 
 def transform_class_map(name: str, game_soup: BeautifulSoup) -> pd.DataFrame:
-    '''Create mapping of game classifications'''
+    """Create mapping of game classifications
+
+    Args:
+        game_soup (BeautifulSoup): Game data as BeautifulSoup obj
+
+    Returns:
+        pd.DataFrame: Relationship table as Pandas DataFrame
+    """
     raw = [(int(game_soup.attrs['id']), int(line.attrs['id']))
             for line in game_soup.find_all('link', type=f'boardgame{name}')]
     return pd.DataFrame.from_records(raw, columns=['game_id', f'{name}_id'])
 
 
 def save_df(dataframe: pd.DataFrame, name: str, csv_dir: str) -> None:
-    '''Deduplicate and save df to csv'''
+    """Deduplicate and save df to csv
+
+    Args:
+        dataframe (pd.DataFrame): Pandas DataFrame to save as csv
+        name (str): Name of file to write to, without extension
+        csv_dir (str): Directory to write file in
+    """
     with open(f'{csv_dir}/{name}.csv', 'w', encoding='utf-8') as file:
         dataframe.drop_duplicates().to_csv(file, index=False)
 
 
 def main(xml_dir: str, csv_dir: str):
-    '''Create DataFrames'''
+    """Transform XML game data to CSV files
+
+    Args:
+        xml_dir (str): Directory holding XML formatted data
+        csv_dir (str): Directory to save CSV formatted data to
+    """
 
     # Instantiate lists of records for each table
     games = []

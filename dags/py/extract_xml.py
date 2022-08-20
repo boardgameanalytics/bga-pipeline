@@ -1,7 +1,7 @@
-'''Scrape game information from BGG
+"""Scrape game information from BGG
 
 Takes bgg game ids and generates batched xml files
-'''
+"""
 
 import os
 from math import ceil
@@ -9,13 +9,13 @@ from requests import Response
 from py.bggxmlapi2 import fetch_game
 
 def save_file(path: str, filename: str, content: str) -> None:
-    '''Save page to file
+    """Save page to file
 
     Args:
         path (str): path to file location
         filename (str): name of file, with file extension
         content (str): raw str to write to file
-    '''
+    """
     filepath = f'{path}/{filename}'
     if not os.path.exists(path):
         os.makedirs(path)
@@ -23,7 +23,7 @@ def save_file(path: str, filename: str, content: str) -> None:
         file.write(content)
 
 def scrape_game_pages(game_ids_list: list, batch_size: int) -> Response:
-    '''Fetch, save, and extract data from game pages
+    """Fetch, save, and extract data from game pages
 
     Args:
         game_ids_list (list): list of game ids to scrape
@@ -31,7 +31,7 @@ def scrape_game_pages(game_ids_list: list, batch_size: int) -> Response:
 
     Returns:
         Yields batches of games as Reponse objects
-    '''
+    """
     total_batches = ceil(len(game_ids_list) // batch_size) + 1
     for batch_num in range(total_batches):
         begin = batch_num * batch_size
@@ -40,13 +40,13 @@ def scrape_game_pages(game_ids_list: list, batch_size: int) -> Response:
         yield fetch_game(id_batch)
 
 def main(game_ids_file: str, dest_path: str, batch_size: int) -> None:
-    '''Run scraper
+    """Run scraper
 
     Args:
         game_ids_file (str): Filepath of csv file containing game ids
         dest_path (str): Filepath of directory to save xml files
         batch_size (int): Number of games to include per API query
-    '''
+    """
 
     # Load game ids
     with open(game_ids_file, 'r', encoding='utf-8') as file:
