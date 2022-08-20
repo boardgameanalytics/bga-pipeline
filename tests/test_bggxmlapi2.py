@@ -1,7 +1,6 @@
 '''Tests for BoardGameGeek XMLAPI2 helper functions'''
 
 import re
-from requests import Response
 from dags.py import bggxmlapi2 as api
 
 
@@ -36,19 +35,19 @@ def test_build_query_batch():
 def test_fetch_game():
     '''Test fetch game for single id'''
     test_id = 224517
-    test_res = api.fetch_game(test_id)
-    assert isinstance(test_res, Response), 'Did not return a Response object'
+    text = api.fetch_game(test_id)
+    assert isinstance(text, str), 'Did not return a str'
     ans_item = r'<item type="boardgame" id="224517">'
     pattern = re.compile(ans_item)
-    test_item = re.search(pattern, str(test_res.content))[0]
+    test_item = re.search(pattern, str(text))[0]
     assert test_item == ans_item, f'Wrong item returned. Received {test_item}'
 
 
 def test_fetch_game_batch():
     '''Test fetch game for multiple ids'''
     test_id = '224517,160010,150'
-    test_res = api.fetch_game(test_id)
-    assert isinstance(test_res, Response), 'Did not return a Response object'
+    text = api.fetch_game(test_id)
+    assert isinstance(text, str), 'Did not return a str'
     pattern =  re.compile(r'<item type="boardgame" id="\d+">')
-    items_search = re.findall(pattern, str(test_res.content))
+    items_search = re.findall(pattern, str(text))
     assert len(items_search) == 3
