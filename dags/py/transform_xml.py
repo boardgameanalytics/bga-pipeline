@@ -34,7 +34,7 @@ def transform_game_data(game_soup: BeautifulSoup) -> pd.DataFrame:
         'weight': [float(game_soup.find('averageweight').attrs['value'])],
         'owned_copies': [int(game_soup.find('owned').attrs['value'])],
         'wishlist': [int(game_soup.find('wishing').attrs['value'])],
-        'kickstarter': [int(bool(game_soup.find('link', id=8374)))]
+        'kickstarter': [bool(game_soup.find('link', id=8374))]
     }
 
     return pd.DataFrame.from_dict(raw)
