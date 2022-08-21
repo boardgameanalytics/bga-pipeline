@@ -3,5 +3,5 @@
     "batch_size" : 1200,
     "xml_dir" : "data/xml",
     "csv_dir" : "data/csv",
-    "game_ids_file" : "data/game_ids.csv"
+    "game_ids_file" : "data/ranked_game_ids.csv"
 }
