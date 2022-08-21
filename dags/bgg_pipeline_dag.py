@@ -38,7 +38,9 @@ CSV_DIR = Path(Variable.get('csv_dir'))
 GAME_IDS_FILE = Path(Variable.get('game_ids_file'))
 
 def _count_rows(file: Path) -> int:
-    """Get line count of file"""
+    """Get line count of file
+    Returns total count - 1, to not include csv header
+    """
     count = -1 # initialize to -1
     for count, _ in enumerate(file.open()):
         pass
