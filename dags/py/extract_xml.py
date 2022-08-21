@@ -3,23 +3,20 @@
 Takes bgg game ids and generates batched xml files
 """
 
-import os
+from pathlib import Path
 from math import ceil
 from requests import Response
 from py.bggxmlapi2 import fetch_game
 
-def save_file(path: str, filename: str, content: str) -> None:
+def save_file(path: Path, content: str) -> None:
     """Save page to file
 
     Args:
-        path (str): path to file location
-        filename (str): name of file, with file extension
+        path (Path): file location to write to
         content (str): raw str to write to file
     """
-    filepath = f'{path}/{filename}'
-    if not os.path.exists(path):
-        os.makedirs(path)
-    with open(filepath, 'w', encoding='utf-8') as file:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, 'w', encoding='utf-8') as file:
         file.write(content)
 
 def scrape_game_pages(game_ids_list: list, batch_size: int) -> Response:
@@ -39,20 +36,20 @@ def scrape_game_pages(game_ids_list: list, batch_size: int) -> Response:
         id_batch = ','.join(game_ids_list[begin:end])
         yield fetch_game(id_batch)
 
-def main(game_ids_file: str, dest_path: str, batch_size: int) -> None:
+def main(game_ids_file: Path, dest_dir: Path, batch_size: int) -> None:
     """Run scraper
 
     Args:
-        game_ids_file (str): Filepath of csv file containing game ids
-        dest_path (str): Filepath of directory to save xml files
+        game_ids_file (Path): Filepath of csv file containing game ids
+        dest_dir (Path): Filepath of directory to save xml files
         batch_size (int): Number of games to include per API query
     """
 
     # Load game ids
-    with open(game_ids_file, 'r', encoding='utf-8') as file:
+    with game_ids_file.open() as file:
         game_ids = file.read().split('\n')
 
     # Scrape game data in batches
-    for num, page in enumerate(scrape_game_pages(game_ids, batch_size)):
-        batch_filename = f'bgg_games_batch_{str(num).zfill(2)}.xml'
-        save_file(dest_path, batch_filename, page)
+    for num, xml in enumerate(scrape_game_pages(game_ids, batch_size)):
+        dest_path = dest_dir / f'bgg_games_batch_{str(num).zfill(2)}.xml'
+        save_file(dest_path, xml)
