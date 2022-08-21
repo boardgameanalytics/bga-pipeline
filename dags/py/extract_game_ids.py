@@ -2,6 +2,7 @@
 
 import re
 from time import sleep
+from pathlib import Path
 import requests
 from bs4 import BeautifulSoup
 from dotenv import dotenv_values
@@ -98,11 +99,11 @@ def scrape_browse_pages():
         break
 
 
-def main(dest: str) -> None:
+def main(dest: Path) -> None:
     """Run scraper and save to csv
 
     Args:
-        dest (str): file to write output to
+        dest (Path): file to write output to
     """
     with open(dest, 'w', encoding='utf-8') as file:
         for id_list in scrape_browse_pages():

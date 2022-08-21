@@ -1,16 +1,17 @@
 '''Boardgame ETL DAG'''
 
 import sys
+from pathlib import Path
 from datetime import datetime, timedelta
 
 from airflow import DAG
 from airflow.models import Variable
 from airflow.models.baseoperator import chain
-from airflow.hooks.base_hook import BaseHook
 from airflow.operators.python import PythonOperator
-from airflow.operators.sql import SQLCheckOperator
+from airflow.operators.sql import SQLValueCheckOperator
 from airflow.providers.http.sensors.http import HttpSensor
 from airflow.providers.postgres.operators.postgres import PostgresOperator
+from airflow.providers.postgres.hooks.postgres import PostgresHook
 
 sys.path.append("/opt/airflow/dag/py")
 from py import extract_game_ids, extract_xml, transform_xml, load
@@ -30,11 +31,18 @@ default_args = {
 }
 
 
-DB_CONN_ID = Variable.get('db_conn_id') # 'postgres_db'
-BATCH_SIZE = int(Variable.get('batch_size')) # 1200
-XML_PATH = Variable.get('xml_path') # 'data/xml'
-CSV_PATH = Variable.get('csv_path') # 'data/csv'
-GAME_IDS_FILE = Variable.get('game_ids_file') # 'data/game_ids.csv'
+DB_CONN_ID = Variable.get('db_conn_id')
+BATCH_SIZE = int(Variable.get('batch_size'))
+XML_DIR = Path(Variable.get('xml_dir'))
+CSV_DIR = Path(Variable.get('csv_dir'))
+GAME_IDS_FILE = Path(Variable.get('game_ids_file'))
+
+def _count_rows(file: Path) -> int:
+    """Get line count of file"""
+    count = -1 # initialize to -1
+    for count, _ in enumerate(file.open()):
+        pass
+    return count
 
 
 with DAG(dag_id='bgg_pipeline',
@@ -42,6 +50,10 @@ with DAG(dag_id='bgg_pipeline',
          schedule_interval='00 4 * * *',
          catchup=False
          ) as dag:
+
+    # Setup
+    pg_hook = PostgresHook(postgres_conn_id=DB_CONN_ID)
+    pg_engine = pg_hook.get_sqlalchemy_engine()
 
     # Check if the API is available
     is_api_available = HttpSensor(
@@ -69,7 +81,7 @@ with DAG(dag_id='bgg_pipeline',
         python_callable=extract_xml.main,
         op_kwargs={
             'game_ids_file': GAME_IDS_FILE,
-            'dest_path': XML_PATH,
+            'dest_dir': XML_DIR,
             'batch_size': BATCH_SIZE
         }
     )
@@ -79,36 +91,41 @@ with DAG(dag_id='bgg_pipeline',
         task_id='transform_data',
         python_callable=transform_xml.main,
         op_kwargs={
-            'xml_dir': XML_PATH,
-            'csv_dir': CSV_PATH
+            'xml_dir': XML_DIR,
+            'csv_dir': CSV_DIR
         }
     )
 
     # Create fresh staging tables
     create_staging_tables = PostgresOperator(
-        task_id = 'create_staging_tables',
+        task_id='create_staging_tables',
         postgres_conn_id=DB_CONN_ID,
         sql='sql/create_tables.sql'
     )
 
-    # Load data to db
-    load_data = PythonOperator(
-        task_id = 'load_data',
+    # Load tables
+    load_tables = PythonOperator(
+        task_id='load_tables',
         python_callable=load.main,
         op_kwargs={
-            'csv_dir': CSV_PATH,
-            'conn_str': BaseHook.get_connection(DB_CONN_ID).get_uri()
+            'csv_dir': CSV_DIR,
+            'engine': pg_engine
         }
     )
 
-    # Validate
-    validate_table_game = SQLCheckOperator(
-        task_id='validate_table_game',
-        conn_id=DB_CONN_ID,
-        sql='''
-            SELECT COUNT(*) FROM game
-        '''
-    )
+    csv_files = sorted([str(i) for i in CSV_DIR.iterdir()], key=len)
+    validate_tables = []
+    for path in csv_files:
+        path = Path(path)
+        tablename = path.stem
+        row_count = _count_rows(path)
+        # Validate table data
+        validate_tables.append(SQLValueCheckOperator(
+            task_id=f'validate_table_{tablename}',
+            conn_id=DB_CONN_ID,
+            sql=f"SELECT COUNT(*) FROM {tablename}",
+            pass_value=row_count
+        ))
 
     # Dependencies
     chain(
@@ -117,6 +134,6 @@ with DAG(dag_id='bgg_pipeline',
         extract_data,
         transform_data,
         create_staging_tables,
-        load_data,
-        validate_table_game
+        load_tables,
+        validate_tables
     )

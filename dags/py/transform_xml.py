@@ -1,7 +1,7 @@
 """ETL Pipeline for game batch XML -> csv"""
 
 import re
-from os import listdir
+from pathlib import Path
 import pandas as pd
 from bs4 import BeautifulSoup
 
@@ -93,19 +93,18 @@ def transform_class_map(name: str, game_soup: BeautifulSoup) -> pd.DataFrame:
     return pd.DataFrame.from_records(raw, columns=['game_id', f'{name}_id'])
 
 
-def save_df(dataframe: pd.DataFrame, name: str, csv_dir: str) -> None:
+def save_df(dataframe: pd.DataFrame, dest: Path) -> None:
     """Deduplicate and save df to csv
 
     Args:
         dataframe (pd.DataFrame): Pandas DataFrame to save as csv
-        name (str): Name of file to write to, without extension
-        csv_dir (str): Directory to write file in
+        dest (Path): Path of file to write to
     """
-    with open(f'{csv_dir}/{name}.csv', 'w', encoding='utf-8') as file:
+    with open(dest, 'w', encoding='utf-8') as file:
         dataframe.drop_duplicates().to_csv(file, index=False)
 
 
-def main(xml_dir: str, csv_dir: str):
+def main(xml_dir: Path, csv_dir: str):
     """Transform XML game data to CSV files
 
     Args:
@@ -119,13 +118,10 @@ def main(xml_dir: str, csv_dir: str):
     classifications = {item: [] for item in CLASS_TYPES}
     class_maps = {item: [] for item in CLASS_TYPES}
 
-    # Get list of all xml files in xml_dir
-    xml_files = [file for file in listdir(xml_dir) if file[-4:] == '.xml']
-
     # Iterate through all xml batch files
-    for filename in xml_files:
+    for xml_file in xml_dir.glob('*.xml'):
         # Load xml file
-        with open(f'{xml_dir}/{filename}', 'rb') as file:
+        with xml_file.open() as file:
             batch = BeautifulSoup(file, features='xml')
 
         # Split xml file into list of individual games
@@ -141,13 +137,13 @@ def main(xml_dir: str, csv_dir: str):
                 data.append(transform_class_map(name, game_soup))
 
     ## Save to csv ##
-    save_df(pd.concat(games), 'game', csv_dir)
-    save_df(pd.concat(game_desc), 'game_description', csv_dir)
+    save_df(pd.concat(games), csv_dir / 'game.csv')
+    save_df(pd.concat(game_desc), csv_dir / 'game_description.csv')
 
     # classification data
     for name, dfs in classifications.items():
-        save_df(pd.concat(dfs), name, csv_dir)
+        save_df(pd.concat(dfs), csv_dir / f'{name}.csv')
 
     # game-classification relationships
     for name, dfs in class_maps.items():
-        save_df(pd.concat(dfs), f'game_{name}', csv_dir)
+        save_df(pd.concat(dfs), csv_dir / f'game_{name}.csv')

@@ -1,7 +1,7 @@
 {
     "db_conn_id" : "postgres_db",
     "batch_size" : 1200,
-    "xml_path" : "data/xml",
-    "csv_path" : "data/csv",
+    "xml_dir" : "data/xml",
+    "csv_dir" : "data/csv",
     "game_ids_file" : "data/game_ids.csv"
 }

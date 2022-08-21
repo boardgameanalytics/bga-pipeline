@@ -1,26 +1,23 @@
 """Load functions for ETL pipeline"""
 
-import re
-from os import listdir
+from pathlib import Path
 import pandas as pd
-from sqlalchemy import create_engine
 
-def main(csv_dir: str, conn_str: str) -> None:
-    """Load csv files as tables in database
+def load_table(csv_path: Path, engine) -> None:
+    """Load contents of CSV file into SQL database table
 
     Args:
-        csv_dir (str): Path to directory containing csv files
-        conn_str (str): Connection URI for SQL Alchemy
+        csv_path (str): Path of CSV file to load into table
+        engine: DB connection object
     """
-    conn_str = re.sub(r'postgres://', 'postgresql://', conn_str)
-    engine = create_engine(conn_str)
-    # Load csv filenames
-    csv_filenames = [file for file in listdir(csv_dir) if file[-4:] == '.csv']
-    # Sort csv files by length to ensure relation tables are loaded last
-    csv_filenames.sort(key=len)
+    tablename = csv_path.stem
+    table_df = pd.read_csv(csv_path, header=0)
+    table_df.to_sql(tablename, engine, if_exists='append', index=None)
 
-    for filename in csv_filenames:
-        filepath = f'{csv_dir}/{filename}'
-        tablename = filename.split('.')[0]
-        table_df = pd.read_csv(filepath, header=0)
-        table_df.to_sql(tablename, engine, if_exists='append', index=None)
+
+def main(csv_dir: Path, engine) -> None:
+    """Load all CSV files in csv_dir to tables"""
+    csv_files = sorted([str(i) for i in csv_dir.iterdir()], key=len)
+    for csv in csv_files:
+        print(f'Loading {csv}')
+        load_table(Path(csv), engine)
