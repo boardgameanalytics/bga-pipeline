@@ -1,3 +1,12 @@
+/* Create boardgames table structure
+
+This script is intended for use on a staging database, and will drop all
+existing tables and recreate from scratch.
+
+FK constraints are also disabled for loading purposes, and should be added after
+loading with the enable_fk_constraints.sql script.
+*/
+
 DROP TABLE IF EXISTS
     game_artist,
     game_category,
@@ -58,68 +67,68 @@ CREATE TABLE designer (
 
 CREATE TABLE game_description (
     game_id         int PRIMARY KEY,
-    description     text NOT NULL,
-    CONSTRAINT fk_game_id
-        FOREIGN KEY(game_id) 
-        REFERENCES game(id)
+    description     text NOT NULL
+    -- CONSTRAINT fk_game_id
+    --     FOREIGN KEY(game_id) 
+    --     REFERENCES game(id)
 );
 
 CREATE TABLE game_mechanic (
     game_id      int,
     mechanic_id  int,
-    PRIMARY KEY (game_id, mechanic_id),
-    CONSTRAINT fk_game_id
-        FOREIGN KEY(game_id) 
-        REFERENCES game(id),
-    CONSTRAINT fk_mech_id
-        FOREIGN KEY(mechanic_id) 
-        REFERENCES mechanic(id)
+    PRIMARY KEY (game_id, mechanic_id)
+    -- CONSTRAINT fk_game_id
+    --     FOREIGN KEY(game_id) 
+    --     REFERENCES game(id),
+    -- CONSTRAINT fk_mech_id
+    --     FOREIGN KEY(mechanic_id) 
+    --     REFERENCES mechanic(id)
 );
 
 CREATE TABLE game_category (
     game_id     int,
     category_id int,
-    PRIMARY KEY (game_id, category_id),
-    CONSTRAINT fk_game_id
-        FOREIGN KEY(game_id) 
-        REFERENCES game(id),
-    CONSTRAINT fk_cat_id
-        FOREIGN KEY(category_id) 
-        REFERENCES category(id)
+    PRIMARY KEY (game_id, category_id)
+    -- CONSTRAINT fk_game_id
+    --     FOREIGN KEY(game_id) 
+    --     REFERENCES game(id),
+    -- CONSTRAINT fk_cat_id
+    --     FOREIGN KEY(category_id) 
+    --     REFERENCES category(id)
 );
 
 CREATE TABLE game_designer (
     game_id     int,
     designer_id int,
-    PRIMARY KEY (game_id, designer_id),
-    CONSTRAINT fk_game_id
-        FOREIGN KEY(game_id) 
-        REFERENCES game(id),
-    CONSTRAINT fk_cat_id
-        FOREIGN KEY(designer_id) 
-        REFERENCES designer(id)
+    PRIMARY KEY (game_id, designer_id)
+    -- CONSTRAINT fk_game_id
+    --     FOREIGN KEY(game_id) 
+    --     REFERENCES game(id),
+    -- CONSTRAINT fk_cat_id
+    --     FOREIGN KEY(designer_id) 
+    --     REFERENCES designer(id)
 );
 
 CREATE TABLE game_artist (
     game_id     int,
     artist_id   int,
-    PRIMARY KEY (game_id, artist_id),
-    CONSTRAINT fk_game_id
-        FOREIGN KEY(game_id) 
-        REFERENCES game(id),
-    CONSTRAINT fk_cat_id
-        FOREIGN KEY(artist_id) 
-        REFERENCES artist(id)
+    PRIMARY KEY (game_id, artist_id)
+    -- CONSTRAINT fk_game_id
+    --     FOREIGN KEY(game_id) 
+    --     REFERENCES game(id),
+    -- CONSTRAINT fk_cat_id
+    --     FOREIGN KEY(artist_id) 
+    --     REFERENCES artist(id)
 );
 
 CREATE TABLE game_publisher (
     game_id     int,
     publisher_id   int,
-    PRIMARY KEY (game_id, publisher_id),
-    CONSTRAINT fk_game_id
-        FOREIGN KEY(game_id) 
-        REFERENCES game(id),
-    CONSTRAINT fk_cat_id
-        FOREIGN KEY(publisher_id) 
-        REFERENCES publisher(id)
+    PRIMARY KEY (game_id, publisher_id)
+    -- CONSTRAINT fk_game_id
+    --     FOREIGN KEY(game_id) 
+    --     REFERENCES game(id),
+    -- CONSTRAINT fk_cat_id
+    --     FOREIGN KEY(publisher_id) 
+    --     REFERENCES publisher(id)
 );

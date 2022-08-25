@@ -105,22 +105,23 @@ with DAG(dag_id='bgg_pipeline',
         sql='sql/create_tables.sql'
     )
 
-    # Load tables
-    load_tables = PythonOperator(
-        task_id='load_tables',
-        python_callable=load.main,
-        op_kwargs={
-            'csv_dir': CSV_DIR,
-            'engine': pg_engine
-        }
-    )
-
-    csv_files = sorted([str(i) for i in CSV_DIR.iterdir()], key=len)
+    load_tables = []
     validate_tables = []
-    for path in csv_files:
+    for path in CSV_DIR.iterdir():
         path = Path(path)
         tablename = path.stem
         row_count = _count_rows(path)
+
+        # Load table data
+        load_tables.append(PythonOperator(
+        task_id=f'load_table_{tablename}',
+        python_callable=load.load_table,
+        op_kwargs={
+            'csv_path': path,
+            'engine': pg_engine
+            }
+        ))
+
         # Validate table data
         validate_tables.append(SQLValueCheckOperator(
             task_id=f'validate_table_{tablename}',
@@ -128,6 +129,13 @@ with DAG(dag_id='bgg_pipeline',
             sql=f"SELECT COUNT(*) FROM {tablename}",
             pass_value=row_count
         ))
+
+    # Disable FK Constraints for faster loading
+    enable_fk_constraint = PostgresOperator(
+        task_id='enable_fk_constraint',
+        postgres_conn_id=DB_CONN_ID,
+        sql='sql/enable_fk_constraints.sql'
+    )
 
     # Dependencies
     chain(
@@ -137,5 +145,6 @@ with DAG(dag_id='bgg_pipeline',
         transform_data,
         create_staging_tables,
         load_tables,
+        enable_fk_constraint,
         validate_tables
     )
