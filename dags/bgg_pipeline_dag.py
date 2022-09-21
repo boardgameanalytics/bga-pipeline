@@ -148,3 +148,4 @@ with DAG(dag_id='bgg_pipeline',
         enable_fk_constraint,
         validate_tables
     )
+    create_staging_tables >> enable_fk_constraint
