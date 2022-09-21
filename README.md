@@ -1,11 +1,11 @@
-# Boardgame Project ETL Pipeline
+# BGA ETL Pipeline
 
-![flake8](https://github.com/randynobx/boardgame-pipeline/actions/workflows/flake8.yml/badge.svg?event=push)
-![pytest](https://github.com/randynobx/boardgame-pipeline/actions/workflows/pytest.yml/badge.svg?event=push)
+![flake8](https://github.com/boardgameanalytics/bga-pipeline/actions/workflows/flake8.yml/badge.svg?event=push)
+![pytest](https://github.com/boardgameanalytics/bga-pipeline/actions/workflows/pytest.yml/badge.svg?event=push)
 
 A fully automated ETL pipeline using Apache Airflow, BeautifulSoup4, and Pandas to create a data warehouse of board game data from [BoardGameGeek.com](https://boardgamegeek.com/) using their [BGGXMLAPI2](https://boardgamegeek.com/wiki/page/BGG_XML_API2).
 
-This pipeline was created to prepare and deliver data for modeling and analysis in the [Boardgame Project Dashboard](https://github.com/randynobx/boardgame_project_dashboard).
+This pipeline was created to prepare and deliver data for modeling and analysis in the [Boardgame Project Dashboard](https://github.com/boardgameanalytics/bga-web-dashboard).
 
 # Contents
 - [How to use this pipeline](#how-to-use)
@@ -29,7 +29,7 @@ Create a `.env` file in the project directory and add your BGG login credentials
 
 ```
 BGG_USERNAME="your_username"
-BGG_PASSWORD="*************"
+BGG_PASSWORD="password1234!"
 ```
 
 ## Setup Docker Environment
