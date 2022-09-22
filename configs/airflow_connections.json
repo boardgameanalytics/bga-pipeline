@@ -1,6 +1,0 @@
-{
-    "api_bggxmlapi2" : {
-        "conn_type" : "http",
-        "host" : "https://boardgamegeek.com/xmlapi2"
-    }
-}

@@ -6,3 +6,4 @@ logs
 Pipfile*
 .env
 scratch*
+airflow_connections.json
