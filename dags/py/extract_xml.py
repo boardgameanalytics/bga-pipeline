@@ -8,6 +8,7 @@ from math import ceil
 from requests import Response
 from .bggxmlapi2 import fetch_game
 
+
 def save_file(path: Path, content: str) -> None:
     """Save page to file
 
@@ -18,6 +19,7 @@ def save_file(path: Path, content: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, 'w', encoding='utf-8') as file:
         file.write(content)
+
 
 def scrape_game_pages(game_ids_list: list, batch_size: int) -> Response:
     """Fetch, save, and extract data from game pages
@@ -35,6 +37,7 @@ def scrape_game_pages(game_ids_list: list, batch_size: int) -> Response:
         end = min(begin + batch_size, len(game_ids_list))
         id_batch = ','.join(game_ids_list[begin:end])
         yield fetch_game(id_batch)
+
 
 def main(game_ids_file: Path, dest_dir: Path, batch_size: int) -> None:
     """Run scraper

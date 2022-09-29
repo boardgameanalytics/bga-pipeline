@@ -19,11 +19,11 @@ def build_query(query_type: str, params: dict) -> str:
     return url.strip('&')
 
 
-def fetch_game(game_id: int) -> str:
+def fetch_game(game_id: str) -> str:
     """Fetch game data from BGG
 
     Args:
-        game_id (int): numerical id of game on BGG
+        game_id (str): numerical id of game on BGG
 
     Returns:
         str: Game data encoded with XML

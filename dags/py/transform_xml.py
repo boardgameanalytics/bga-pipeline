@@ -39,6 +39,7 @@ def transform_game_data(game_soup: BeautifulSoup) -> pd.DataFrame:
 
     return pd.DataFrame.from_dict(raw)
 
+
 def transform_game_desc(game_soup: BeautifulSoup) -> pd.DataFrame:
     """Transform game descriptions to df
 
@@ -48,6 +49,7 @@ def transform_game_desc(game_soup: BeautifulSoup) -> pd.DataFrame:
     Returns:
         pd.DataFrame: Game description as Pandas DataFrame
     """
+
     def clean_description(text: str):
         text = re.sub(r'&rsquo;', '\'', text)
         text = re.sub(r'&#.{,5};', ' ', text)
@@ -63,10 +65,12 @@ def transform_game_desc(game_soup: BeautifulSoup) -> pd.DataFrame:
 
     return pd.DataFrame.from_dict(raw)
 
+
 def transform_game_classification(name: str, game_soup: BeautifulSoup) -> pd.DataFrame:
     """Transform given classification ids from game's XML fragment to df
 
     Args:
+        name (str): Name of classification to extract from data
         game_soup (BeautifulSoup): Game data as BeautifulSoup obj
 
     Returns:
@@ -74,7 +78,7 @@ def transform_game_classification(name: str, game_soup: BeautifulSoup) -> pd.Dat
     """
 
     raw = [(int(line.attrs['id']), str(line.attrs['value']))
-            for line in game_soup.find_all('link', type=f'boardgame{name}')]
+           for line in game_soup.find_all('link', type=f'boardgame{name}')]
 
     return pd.DataFrame.from_records(raw, columns=['id', 'name'])
 
@@ -83,13 +87,14 @@ def transform_class_map(name: str, game_soup: BeautifulSoup) -> pd.DataFrame:
     """Create mapping of game classifications
 
     Args:
+        name (str): Name of classification to create map of
         game_soup (BeautifulSoup): Game data as BeautifulSoup obj
 
     Returns:
         pd.DataFrame: Relationship table as Pandas DataFrame
     """
     raw = [(int(game_soup.attrs['id']), int(line.attrs['id']))
-            for line in game_soup.find_all('link', type=f'boardgame{name}')]
+           for line in game_soup.find_all('link', type=f'boardgame{name}')]
     return pd.DataFrame.from_records(raw, columns=['game_id', f'{name}_id'])
 
 
@@ -136,7 +141,7 @@ def main(xml_dir: Path, csv_dir: str):
             for name, data in class_maps.items():
                 data.append(transform_class_map(name, game_soup))
 
-    ## Save to csv ##
+    # Save to csv
     save_df(pd.concat(games), csv_dir / 'game.csv')
     save_df(pd.concat(game_desc), csv_dir / 'game_description.csv')
 

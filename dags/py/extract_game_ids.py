@@ -24,10 +24,10 @@ def authenticate(username: str, password: str) -> requests.Session:
     """
     login_url = 'https://boardgamegeek.com/login/api/v1'
     creds = {
-    "credentials" : {
-        "username" : username,
-        "password" : password
-        }
+        "credentials" : {
+            "username" : username,
+            "password" : password
+            }
     }
 
     session = requests.Session()
@@ -51,9 +51,10 @@ def extract_ranked_game_ids(text: str) -> list:
         list of game id's
     """
     soup = BeautifulSoup(text, features='html.parser')
+
     def _extract(soup: BeautifulSoup):
         for row in soup.find_all(id="row_"):
-            #if rank := row.find(class_='collection_rank'):
+            # if rank := row.find(class_='collection_rank'):
             rank = row.find(class_='collection_rank')
             if rank is not None:
                 if rank.a:
