@@ -38,7 +38,7 @@ CREATE TABLE game (
     owned_copies    int,
     wishlist        int,
     kickstarter     bool,
-    popularity      real GENERATED ALWAYS AS (LN(ABS((bayes_rating - 5.5) * total_ratings) + 1) * SIGN((bayes_rating - 5.5)) STORED
+    popularity      real GENERATED ALWAYS AS (LN(ABS((bayes_rating - 5.5) * total_ratings) + 1) * SIGN((bayes_rating - 5.5))) STORED
 );
 
 CREATE TABLE mechanic (
