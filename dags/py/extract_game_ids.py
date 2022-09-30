@@ -12,21 +12,14 @@ MAX_PAGE_NUM = 250
 WAIT_TIME = 5  # seconds
 
 
-def authenticate(username: str, password: str) -> requests.Session:
-    """_summary_
-
-    Args:
-        username (str): bgg username
-        password (str): bgg password
-
-    Returns:
-        requests.Session: authenticated requests session
-    """
+def authenticate() -> requests.Session:
+    """Create authenticated Requests session with BGG.com"""
     login_url = 'https://boardgamegeek.com/login/api/v1'
+    env_vars = dotenv_values('.env')
     creds = {
         "credentials": {
-            "username": username,
-            "password": password
+            "username": env_vars['BGG_USERNAME'],
+            "password": env_vars['BGG_PASSWORD']
             }
     }
 
@@ -51,17 +44,17 @@ def extract_ranked_game_ids(text: str) -> list:
         list of game id's
     """
     soup = BeautifulSoup(text, features='html.parser')
+    id_list = []
 
-    def _extract(soup: BeautifulSoup):
-        for row in soup.find_all(id="row_"):
-            # if rank := row.find(class_='collection_rank'):
-            rank = row.find(class_='collection_rank')
-            if rank is not None:
-                if rank.a:
-                    text = row.find(class_='primary').attrs['href']
-                    yield re.search(r'/boardgame/(\d+)/', text).group(1)
+    for row in soup.find_all(id="row_"):
+        # if rank := row.find(class_='collection_rank'):
+        rank = row.find(class_='collection_rank')
+        if rank is not None:
+            if rank.a:
+                text = row.find(class_='primary').attrs['href']
+                id_list.append(re.search(r'/boardgame/(\d+)/', text).group(1))
 
-    return list(_extract(soup))
+    return id_list
 
 
 def scrape_browse_pages():
@@ -71,11 +64,8 @@ def scrape_browse_pages():
         list: list of game ids as integers
     """
 
-    # Create authenticated session
     print('Authenticating...')
-    creds = dotenv_values('.env')
-    username, password = creds['BGG_USERNAME'], creds['BGG_PASSWORD']
-    session = authenticate(username, password)
+    session = authenticate()
     print('Authentication Successful.')
 
     print('Beginning scrape...')
@@ -84,7 +74,7 @@ def scrape_browse_pages():
 
         res = session.get(url)
         if res.status_code == 200:
-            #if new_ids := extract_ranked_game_ids(res.content.decode()):
+            # if new_ids := extract_ranked_game_ids(res.content.decode()):
             new_ids = extract_ranked_game_ids(res.content.decode())
             if new_ids is not None:
                 print(page_num, end='')
@@ -92,13 +82,12 @@ def scrape_browse_pages():
                 sleep(WAIT_TIME)
                 continue
 
-        # Conclude collection and return list of accumulated ids
         print(f'\nFinished on page {page_num}.')
         break
 
 
 def main(destination_path: Path) -> None:
-    """Run scraper and save to csv
+    """Run scraper and save output to csv
 
     Args:
         destination_path (Path): file to write output to
