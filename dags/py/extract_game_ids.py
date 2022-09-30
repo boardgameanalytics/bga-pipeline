@@ -9,7 +9,7 @@ from dotenv import dotenv_values
 
 # constraints
 MAX_PAGE_NUM = 250
-WAIT_TIME = 5 # seconds
+WAIT_TIME = 5  # seconds
 
 
 def authenticate(username: str, password: str) -> requests.Session:
@@ -24,9 +24,9 @@ def authenticate(username: str, password: str) -> requests.Session:
     """
     login_url = 'https://boardgamegeek.com/login/api/v1'
     creds = {
-        "credentials" : {
-            "username" : username,
-            "password" : password
+        "credentials": {
+            "username": username,
+            "password": password
             }
     }
 
@@ -41,7 +41,7 @@ def extract_ranked_game_ids(text: str) -> list:
     """Extract game id's from webpage
 
     Takes a BGG browse games html page as a string, and extracts game ids from
-    all rows that have a numerical ranking. Non ranked games have a ranking of
+    all rows that have a numerical ranking. Non-ranked games have a ranking of
     'N/A' and will not be included in the returned list.
 
     Args:
@@ -79,33 +79,30 @@ def scrape_browse_pages():
     print('Authentication Successful.')
 
     print('Beginning scrape...')
-    # Iterate through browse pages 1+ until no more ids are returned
     for page_num in range(1, MAX_PAGE_NUM):
         url = f'https://boardgamegeek.com/browse/boardgame/page/{page_num}?sort=rank&sortdir=asc'
 
         res = session.get(url)
-        # Check that page was loaded successfully
         if res.status_code == 200:
-            # Check that game ids were found on page
             #if new_ids := extract_ranked_game_ids(res.content.decode()):
             new_ids = extract_ranked_game_ids(res.content.decode())
             if new_ids is not None:
                 print(page_num, end='')
-                yield new_ids # Yield list of current pages id
-                sleep(WAIT_TIME) # Pause between pages to reduce request freq
-                continue # Continue to the next page
+                yield new_ids
+                sleep(WAIT_TIME)
+                continue
 
-        # Conclude collection and return list of accumilated ids
+        # Conclude collection and return list of accumulated ids
         print(f'\nFinished on page {page_num}.')
         break
 
 
-def main(dest: Path) -> None:
+def main(destination_path: Path) -> None:
     """Run scraper and save to csv
 
     Args:
-        dest (Path): file to write output to
+        destination_path (Path): file to write output to
     """
-    with open(dest, 'w', encoding='utf-8') as file:
+    with open(destination_path, 'w', encoding='utf-8') as file:
         for id_list in scrape_browse_pages():
             file.writelines([str(line) + "\n" for line in id_list])

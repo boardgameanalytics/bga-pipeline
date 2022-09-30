@@ -9,10 +9,10 @@ CLASS_TYPES = ['mechanic', 'category', 'designer', 'artist', 'publisher']
 
 
 def transform_game_data(game_soup: BeautifulSoup) -> pd.DataFrame:
-    """Transform game data from XML fragment to df
+    """Transform game data from XML fragment to Pandas DataFrame
 
     Args:
-        game_soup (BeautifulSoup): Game data as BeautifulSoup obj
+        game_soup (BeautifulSoup): Game data as BeautifulSoup object
 
     Returns:
         pd.DataFrame: Game data as Pandas DataFrame
@@ -40,11 +40,11 @@ def transform_game_data(game_soup: BeautifulSoup) -> pd.DataFrame:
     return pd.DataFrame.from_dict(raw)
 
 
-def transform_game_desc(game_soup: BeautifulSoup) -> pd.DataFrame:
-    """Transform game descriptions to df
+def transform_game_description(game_soup: BeautifulSoup) -> pd.DataFrame:
+    """Transform game descriptions to Pandas DataFrame
 
     Args:
-        game_soup (BeautifulSoup): Game data as BeautifulSoup obj
+        game_soup (BeautifulSoup): Game data as BeautifulSoup object
 
     Returns:
         pd.DataFrame: Game description as Pandas DataFrame
@@ -67,11 +67,11 @@ def transform_game_desc(game_soup: BeautifulSoup) -> pd.DataFrame:
 
 
 def transform_game_classification(name: str, game_soup: BeautifulSoup) -> pd.DataFrame:
-    """Transform given classification ids from game's XML fragment to df
+    """Transform given classification ids from game's XML fragment to Pandas DataFrame
 
     Args:
-        name (str): Name of classification to extract from data
-        game_soup (BeautifulSoup): Game data as BeautifulSoup obj
+        name (str): Classification to extract from data
+        game_soup (BeautifulSoup): Game data as BeautifulSoup object
 
     Returns:
         pd.DataFrame: Game classification data as Pandas DataFrame
@@ -87,8 +87,8 @@ def transform_class_map(name: str, game_soup: BeautifulSoup) -> pd.DataFrame:
     """Create mapping of game classifications
 
     Args:
-        name (str): Name of classification to create map of
-        game_soup (BeautifulSoup): Game data as BeautifulSoup obj
+        name (str): Classification to create map of
+        game_soup (BeautifulSoup): Game data as BeautifulSoup object
 
     Returns:
         pd.DataFrame: Relationship table as Pandas DataFrame
@@ -98,57 +98,38 @@ def transform_class_map(name: str, game_soup: BeautifulSoup) -> pd.DataFrame:
     return pd.DataFrame.from_records(raw, columns=['game_id', f'{name}_id'])
 
 
-def save_df(dataframe: pd.DataFrame, dest: Path) -> None:
-    """Deduplicate and save df to csv
-
-    Args:
-        dataframe (pd.DataFrame): Pandas DataFrame to save as csv
-        dest (Path): Path of file to write to
-    """
-    with open(dest, 'w', encoding='utf-8') as file:
+def save_df(dataframe: pd.DataFrame, destination_path: Path) -> None:
+    """Deduplicate and save df to csv"""
+    with open(destination_path, 'w', encoding='utf-8') as file:
         dataframe.drop_duplicates().to_csv(file, index=False)
 
 
-def main(xml_dir: Path, csv_dir: str):
-    """Transform XML game data to CSV files
-
-    Args:
-        xml_dir (str): Directory holding XML formatted data
-        csv_dir (str): Directory to save CSV formatted data to
-    """
-
-    # Instantiate lists of records for each table
+def main(xml_dir: Path, csv_dir: str) -> None:
+    """Transform XML game data to CSV files"""
     games = []
     game_desc = []
     classifications = {item: [] for item in CLASS_TYPES}
     class_maps = {item: [] for item in CLASS_TYPES}
 
-    # Iterate through all xml batch files
     for xml_file in xml_dir.glob('*.xml'):
-        # Load xml file
+
         with xml_file.open() as file:
             batch = BeautifulSoup(file, features='xml')
 
-        # Split xml file into list of individual games
-        game_batch = [item for item in batch.items.children if item != '\n']
+        for game_soup in batch.items.children:
+            if game_soup != '\n':
+                games.append(transform_game_data(game_soup))
+                game_desc.append(transform_game_description(game_soup))
+                for name, data in classifications.items():
+                    data.append(transform_game_classification(name, game_soup))
+                for name, data in class_maps.items():
+                    data.append(transform_class_map(name, game_soup))
 
-        # Iterate through and transform each game node to df
-        for game_soup in game_batch:
-            games.append(transform_game_data(game_soup))
-            game_desc.append(transform_game_desc(game_soup))
-            for name, data in classifications.items():
-                data.append(transform_game_classification(name, game_soup))
-            for name, data in class_maps.items():
-                data.append(transform_class_map(name, game_soup))
-
-    # Save to csv
     save_df(pd.concat(games), csv_dir / 'game.csv')
     save_df(pd.concat(game_desc), csv_dir / 'game_description.csv')
 
-    # classification data
     for name, dfs in classifications.items():
         save_df(pd.concat(dfs), csv_dir / f'{name}.csv')
 
-    # game-classification relationships
     for name, dfs in class_maps.items():
         save_df(pd.concat(dfs), csv_dir / f'game_{name}.csv')

@@ -10,12 +10,7 @@ from .bggxmlapi2 import fetch_game
 
 
 def save_file(path: Path, content: str) -> None:
-    """Save page to file
-
-    Args:
-        path (Path): file location to write to
-        content (str): raw str to write to file
-    """
+    """Save page to file"""
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, 'w', encoding='utf-8') as file:
         file.write(content)
@@ -29,7 +24,7 @@ def scrape_game_pages(game_ids_list: list, batch_size: int) -> Response:
         batch_size (int): number of ids to bundle into each request
 
     Returns:
-        Yields batches of games as Reponse objects
+        Yields batches of games as Response objects
     """
     total_batches = ceil(len(game_ids_list) // batch_size) + 1
     for batch_num in range(total_batches):
@@ -39,12 +34,12 @@ def scrape_game_pages(game_ids_list: list, batch_size: int) -> Response:
         yield fetch_game(id_batch)
 
 
-def main(game_ids_file: Path, dest_dir: Path, batch_size: int) -> None:
+def main(game_ids_file: Path, destination_dir: Path, batch_size: int) -> None:
     """Run scraper
 
     Args:
-        game_ids_file (Path): Filepath of csv file containing game ids
-        dest_dir (Path): Filepath of directory to save xml files
+        game_ids_file (Path): Filepath of csv file containing game id's
+        destination_dir (Path): Filepath of directory to save xml files
         batch_size (int): Number of games to include per API query
     """
 
@@ -54,5 +49,5 @@ def main(game_ids_file: Path, dest_dir: Path, batch_size: int) -> None:
 
     # Scrape game data in batches
     for num, xml in enumerate(scrape_game_pages(game_ids, batch_size)):
-        dest_path = dest_dir / f'bgg_games_batch_{str(num).zfill(2)}.xml'
-        save_file(dest_path, xml)
+        destination_path = destination_dir / f'bgg_games_batch_{str(num).zfill(2)}.xml'
+        save_file(destination_path, xml)
