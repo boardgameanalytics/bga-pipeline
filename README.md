@@ -3,13 +3,14 @@
 [![Flake8](https://github.com/boardgameanalytics/bga-pipeline/actions/workflows/flake8.yml/badge.svg)](https://github.com/boardgameanalytics/bga-pipeline/actions/workflows/flake8.yml)
 [![Pytests](https://github.com/boardgameanalytics/bga-pipeline/actions/workflows/pytest.yml/badge.svg)](https://github.com/boardgameanalytics/bga-pipeline/actions/workflows/pytest.yml)
 
-A fully automated ETL pipeline using Apache Airflow, BeautifulSoup4, Pandas, and PostgreSQL to create a data warehouse of board game data from [BoardGameGeek.com](https://boardgamegeek.com/) using their [BGGXMLAPI2](https://boardgamegeek.com/wiki/page/BGG_XML_API2).
+A fully automated ETL pipeline using Apache Airflow, BeautifulSoup4, Pandas, and Postgres to create a data warehouse of board game data from [BoardGameGeek.com](https://boardgamegeek.com/) using their [BGGXMLAPI2](https://boardgamegeek.com/wiki/page/BGG_XML_API2).
 
 This pipeline was created to prepare and deliver data for modeling and analysis in the [Boardgame Project Dashboard](https://github.com/boardgameanalytics/bga-web-dashboard).
 
 # Contents
 - [How to Use](#how-to-use)
 - [Customizations](#customizations)
+- [Contributors](#contributors)
 
 
 # How to Use
@@ -72,3 +73,6 @@ when the `configs/setup_airflow.sh` script is run during the `make up` command.
   - `airflow_variables.json`
 
 *WARNING: Changing existing variable or connection entries may cause unexpected behavior!*
+
+# Contributors
+- [Randy Nance](https://github.com/randynobx) - *Data Engineer*
