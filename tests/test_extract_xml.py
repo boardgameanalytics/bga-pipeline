@@ -1,11 +1,8 @@
-"""Unit tests for  extract_xml.py"""
-
 from pathlib import Path
 from dags.py.extract_xml import save_file
 
 
 def test_save_file() -> None:
-    """Test save function"""
     text = "This is a test file."
     testfile = Path('testfile.txt')
 
@@ -19,7 +16,6 @@ def test_save_file() -> None:
 
 
 def test_save_file_missing_dir() -> None:
-    """Test save function inside directory"""
     text = "This is a test file."
     testfile = Path('test_assets/testfile.txt')
 
@@ -36,5 +32,8 @@ def test_save_file_missing_dir() -> None:
 
 
 def test_scrape_game_pages() -> None:
-    """Test scraping function"""
-    pass
+    assert False
+
+
+def test_main():
+    assert False
