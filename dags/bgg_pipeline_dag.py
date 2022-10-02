@@ -1,4 +1,4 @@
-'''Boardgame ETL DAG'''
+"""Boardgame ETL DAG"""
 
 import sys
 from pathlib import Path
@@ -23,13 +23,12 @@ current_date = datetime.today().strftime('%Y-%m-%d')
 default_args = {
 
     "owner": "airflow",
-    "start_date" : current_date,
-    "retries" : 1,
-    "retry_delay" : timedelta(minutes=5),
-    "description" : "Automated ETL pipeline for extracting BGG.com data using \
+    "start_date": current_date,
+    "retries": 1,
+    "retry_delay": timedelta(minutes=5),
+    "description": "Automated ETL pipeline for extracting BGG.com data using \
         the BGGXMLAPI2 REST API."
 }
-
 
 DB_CONN_ID = Variable.get('db_conn_id')
 BATCH_SIZE = int(Variable.get('batch_size'))
@@ -37,11 +36,12 @@ XML_DIR = Path(Variable.get('xml_dir'))
 CSV_DIR = Path(Variable.get('csv_dir'))
 GAME_IDS_FILE = Path(Variable.get('game_ids_file'))
 
+
 def _count_rows(file: Path) -> int:
     """Get line count of file
     Returns total count - 1, to not include csv header
     """
-    count = -1 # initialize to -1
+    count = -1  # initialize to -1
     for count, _ in enumerate(file.open()):
         pass
     return count
@@ -52,7 +52,6 @@ with DAG(dag_id='bgg_pipeline',
          schedule_interval='00 4 * * *',
          catchup=False
          ) as dag:
-
     # Setup
     pg_hook = PostgresHook(postgres_conn_id=DB_CONN_ID)
     pg_engine = pg_hook.get_sqlalchemy_engine()
@@ -63,9 +62,9 @@ with DAG(dag_id='bgg_pipeline',
         method='GET',
         http_conn_id='api_bggxmlapi2',
         endpoint='thing',
-        request_params={'id':'50'},
-        response_check= lambda response: 'item' in response.text,
-        poke_interval = 5
+        request_params={'id': '50'},
+        response_check=lambda response: 'item' in response.text,
+        poke_interval=5
     )
 
     # Extract game IDs
@@ -114,11 +113,11 @@ with DAG(dag_id='bgg_pipeline',
 
         # Load table data
         load_tables.append(PythonOperator(
-        task_id=f'load_table_{tablename}',
-        python_callable=load.load_table,
-        op_kwargs={
-            'csv_path': path,
-            'engine': pg_engine
+            task_id=f'load_table_{tablename}',
+            python_callable=load.load_table,
+            op_kwargs={
+                'csv_path': path,
+                'engine': pg_engine
             }
         ))
 

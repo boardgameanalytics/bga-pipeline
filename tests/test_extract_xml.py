@@ -3,6 +3,7 @@
 from pathlib import Path
 from dags.py.extract_xml import save_file
 
+
 def test_save_file() -> None:
     """Test save function"""
     text = "This is a test file."
@@ -32,6 +33,7 @@ def test_save_file_missing_dir() -> None:
 
     testfile.unlink()
     testfile.parent.rmdir()
+
 
 def test_scrape_game_pages() -> None:
     """Test scraping function"""
