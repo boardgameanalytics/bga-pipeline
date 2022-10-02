@@ -17,7 +17,6 @@ def transform_game_data(game_soup: BeautifulSoup) -> pd.DataFrame:
     Returns:
         pd.DataFrame: Game data as Pandas DataFrame
     """
-
     raw = {
         'id': [int(game_soup.attrs['id'])],
         'title': [game_soup.find('name').attrs['value']],
@@ -34,7 +33,7 @@ def transform_game_data(game_soup: BeautifulSoup) -> pd.DataFrame:
         'weight': [float(game_soup.find('averageweight').attrs['value'])],
         'owned_copies': [int(game_soup.find('owned').attrs['value'])],
         'wishlist': [int(game_soup.find('wishing').attrs['value'])],
-        'kickstarter': [bool(game_soup.find('link', id=8374))]
+        'kickstarter': [bool(game_soup.find('link', id='8374'))]
     }
 
     return pd.DataFrame.from_dict(raw)
@@ -49,14 +48,11 @@ def transform_game_description(game_soup: BeautifulSoup) -> pd.DataFrame:
     Returns:
         pd.DataFrame: Game description as Pandas DataFrame
     """
-
-    def clean_description(text: str):
-        text = re.sub(r'&rsquo;', '\'', text)
-        text = re.sub(r'&#.{,5};', ' ', text)
-        text = re.sub(r' {2,}', ' ', text)
-        return text.strip()
-
-    desc = clean_description(str(game_soup.find('description').string))
+    desc = str(game_soup.find('description').string)
+    desc = re.sub(r'&rsquo;', '\'', desc)
+    desc = re.sub(r'&#.{,5};', ' ', desc)
+    desc = re.sub(r' {2,}', ' ', desc)
+    desc = desc.strip()
 
     raw = {
         'game_id': [int(game_soup.attrs['id'])],
@@ -76,7 +72,6 @@ def transform_game_classification(name: str, game_soup: BeautifulSoup) -> pd.Dat
     Returns:
         pd.DataFrame: Game classification data as Pandas DataFrame
     """
-
     raw = [(int(line.attrs['id']), str(line.attrs['value']))
            for line in game_soup.find_all('link', type=f'boardgame{name}')]
 
@@ -99,12 +94,12 @@ def transform_class_map(name: str, game_soup: BeautifulSoup) -> pd.DataFrame:
 
 
 def save_df(dataframe: pd.DataFrame, destination_path: Path) -> None:
-    """Deduplicate and save df to csv"""
+    """Save DataFrame to csv file"""
     with open(destination_path, 'w', encoding='utf-8') as file:
-        dataframe.drop_duplicates().to_csv(file, index=False)
+        dataframe.to_csv(file, index=False)
 
 
-def main(xml_dir: Path, csv_dir: str) -> None:
+def main(xml_dir: Path, csv_dir: Path) -> None:
     """Transform XML game data to CSV files"""
     games = []
     game_desc = []
@@ -125,11 +120,11 @@ def main(xml_dir: Path, csv_dir: str) -> None:
                 for name, data in class_maps.items():
                     data.append(transform_class_map(name, game_soup))
 
-    save_df(pd.concat(games), csv_dir / 'game.csv')
-    save_df(pd.concat(game_desc), csv_dir / 'game_description.csv')
+    save_df(pd.concat(games).drop_duplicates(), csv_dir / 'game.csv')
+    save_df(pd.concat(game_desc).drop_duplicates(), csv_dir / 'game_description.csv')
 
     for name, dfs in classifications.items():
-        save_df(pd.concat(dfs), csv_dir / f'{name}.csv')
+        save_df(pd.concat(dfs).drop_duplicates(), csv_dir / f'{name}.csv')
 
     for name, dfs in class_maps.items():
-        save_df(pd.concat(dfs), csv_dir / f'game_{name}.csv')
+        save_df(pd.concat(dfs).drop_duplicates(), csv_dir / f'game_{name}.csv')
