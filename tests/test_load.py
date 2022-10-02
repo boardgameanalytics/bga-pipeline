@@ -1,5 +1,3 @@
-"""Unit tests for load.py"""
-
 from pathlib import Path
 import sqlite3
 import pandas as pd
