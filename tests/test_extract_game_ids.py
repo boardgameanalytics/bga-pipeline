@@ -18,7 +18,7 @@ def test_extract_ranked_game_ids():
 
 
 def test_scrape_browse_pages():
-    id_list = list(scrape_browse_pages(2))[0]
+    id_list = list(scrape_browse_pages(max_pages=2, wait_time=0))[0]
     print(id_list)
     assert all(map(str.isnumeric, id_list))
 

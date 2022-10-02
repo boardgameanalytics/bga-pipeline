@@ -8,8 +8,6 @@ import requests
 from bs4 import BeautifulSoup
 from dotenv import dotenv_values
 
-WAIT_TIME = 5  # seconds
-
 
 def authenticate() -> requests.Session:
     """Create authenticated Requests session with BGG.com"""
@@ -56,7 +54,7 @@ def extract_ranked_game_ids(text: str) -> list:
     return id_list
 
 
-def scrape_browse_pages(max_pages: int) -> Generator:
+def scrape_browse_pages(max_pages: int, wait_time: int = 5) -> Generator:
     """Extract game ids of all ranked games on BGG
 
     Returns:
@@ -78,7 +76,7 @@ def scrape_browse_pages(max_pages: int) -> Generator:
             if new_ids is not None:
                 print(page_num, end='')
                 yield new_ids
-                sleep(WAIT_TIME)
+                sleep(wait_time)
                 continue
 
         print(f'\nFinished on page {page_num}.')
