@@ -3,12 +3,11 @@
 import re
 from time import sleep
 from pathlib import Path
+from typing import Generator
 import requests
 from bs4 import BeautifulSoup
 from dotenv import dotenv_values
 
-# constraints
-MAX_PAGE_NUM = 250
 WAIT_TIME = 5  # seconds
 
 
@@ -57,7 +56,7 @@ def extract_ranked_game_ids(text: str) -> list:
     return id_list
 
 
-def scrape_browse_pages():
+def scrape_browse_pages(max_pages: int) -> Generator:
     """Extract game ids of all ranked games on BGG
 
     Returns:
@@ -69,7 +68,7 @@ def scrape_browse_pages():
     print('Authentication Successful.')
 
     print('Beginning scrape...')
-    for page_num in range(1, MAX_PAGE_NUM):
+    for page_num in range(1, max_pages):
         url = f'https://boardgamegeek.com/browse/boardgame/page/{page_num}?sort=rank&sortdir=asc'
 
         res = session.get(url)
@@ -86,12 +85,13 @@ def scrape_browse_pages():
         break
 
 
-def main(destination_path: Path) -> None:
+def main(destination_path: Path, max_pages: int = 250) -> None:
     """Run scraper and save output to csv
 
     Args:
         destination_path (Path): file to write output to
+        max_pages (int): Max number of pages to parse
     """
     with open(destination_path, 'w', encoding='utf-8') as file:
-        for id_list in scrape_browse_pages():
+        for id_list in scrape_browse_pages(max_pages=max_pages):
             file.writelines([str(line) + "\n" for line in id_list])
