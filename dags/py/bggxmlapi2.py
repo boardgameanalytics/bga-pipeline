@@ -1,4 +1,4 @@
-"""Helper functions for using the BoardGameGeek XMLAPI2"""
+"""Helper functions for using the BGGXMLAPI2"""
 
 import requests
 
@@ -14,9 +14,7 @@ def build_query(query_type: str, params: dict) -> str:
         str: Query URL for given parameters
     """
     url = f'https://boardgamegeek.com/xmlapi2/{query_type}?'
-    for key, value in params.items():
-        url += f'{key}={str(value)}&'
-    return url.strip('&')
+    return url + '&'.join([f'{key}={str(value)}' for key, value in params.items()])
 
 
 def fetch_game(game_id: str) -> str:
