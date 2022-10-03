@@ -7,10 +7,12 @@ from pathlib import Path
 from typing import Generator
 import requests
 from bs4 import BeautifulSoup
+from dotenv import load_dotenv
 
 
 def authenticate() -> requests.Session:
     """Create authenticated Requests session with BGG.com"""
+    load_dotenv()
     login_url = 'https://boardgamegeek.com/login/api/v1'
     creds = {
         "credentials": {
