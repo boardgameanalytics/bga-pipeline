@@ -1,9 +1,7 @@
 """Boardgame ETL DAG"""
 
-import sys
 from pathlib import Path
 from datetime import datetime, timedelta
-
 from airflow import DAG
 from airflow.models import Variable
 from airflow.models.baseoperator import chain
@@ -12,22 +10,20 @@ from airflow.operators.sql import SQLValueCheckOperator
 from airflow.providers.http.sensors.http import HttpSensor
 from airflow.providers.postgres.operators.postgres import PostgresOperator
 from airflow.providers.postgres.hooks.postgres import PostgresHook
+from py import extract_game_ids
+from py import extract_xml
+from py import transform_xml
+from py import load
 
-sys.path.append("/opt/airflow/dag/py")
-from py import extract_game_ids, extract_xml, transform_xml, load
-
-# Grab current date
 current_date = datetime.today().strftime('%Y-%m-%d')
 
-# Default settings for all the dags in the pipeline
 default_args = {
 
     "owner": "airflow",
     "start_date": current_date,
     "retries": 1,
     "retry_delay": timedelta(minutes=5),
-    "description": "Automated ETL pipeline for extracting BGG.com data using \
-        the BGGXMLAPI2 REST API."
+    "description": "Automated ETL pipeline for extracting BGG.com data using the BGGXMLAPI2 REST API."
 }
 
 DB_CONN_ID = Variable.get('db_conn_id')
@@ -108,12 +104,12 @@ with DAG(dag_id='bgg_pipeline',
     validate_tables = []
     for path in CSV_DIR.iterdir():
         path = Path(path)
-        tablename = path.stem
+        table_name = path.stem
         row_count = _count_rows(path)
 
         # Load table data
         load_tables.append(PythonOperator(
-            task_id=f'load_table_{tablename}',
+            task_id=f'load_table_{table_name}',
             python_callable=load.load_table,
             op_kwargs={
                 'csv_path': path,
@@ -123,9 +119,9 @@ with DAG(dag_id='bgg_pipeline',
 
         # Validate table data
         validate_tables.append(SQLValueCheckOperator(
-            task_id=f'validate_table_{tablename}',
+            task_id=f'validate_table_{table_name}',
             conn_id=DB_CONN_ID,
-            sql=f"SELECT COUNT(*) FROM {tablename}",
+            sql=f"SELECT COUNT(*) FROM {table_name}",
             pass_value=row_count
         ))
 

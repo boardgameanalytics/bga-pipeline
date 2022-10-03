@@ -1,25 +1,21 @@
 """Extract game IDs for all ranked games on BoardGameGeek.com"""
 
 import re
+from os import getenv
 from time import sleep
 from pathlib import Path
+from typing import Generator
 import requests
 from bs4 import BeautifulSoup
-from dotenv import dotenv_values
-
-# constraints
-MAX_PAGE_NUM = 250
-WAIT_TIME = 5  # seconds
 
 
 def authenticate() -> requests.Session:
     """Create authenticated Requests session with BGG.com"""
     login_url = 'https://boardgamegeek.com/login/api/v1'
-    env_vars = dotenv_values('.env')
     creds = {
         "credentials": {
-            "username": env_vars['BGG_USERNAME'],
-            "password": env_vars['BGG_PASSWORD']
+            "username": getenv('BGG_USERNAME'),
+            "password": getenv('BGG_PASSWORD')
             }
     }
 
@@ -57,7 +53,7 @@ def extract_ranked_game_ids(text: str) -> list:
     return id_list
 
 
-def scrape_browse_pages():
+def scrape_browse_pages(max_pages: int, wait_time: int = 5) -> Generator:
     """Extract game ids of all ranked games on BGG
 
     Returns:
@@ -69,7 +65,7 @@ def scrape_browse_pages():
     print('Authentication Successful.')
 
     print('Beginning scrape...')
-    for page_num in range(1, MAX_PAGE_NUM):
+    for page_num in range(1, max_pages):
         url = f'https://boardgamegeek.com/browse/boardgame/page/{page_num}?sort=rank&sortdir=asc'
 
         res = session.get(url)
@@ -79,19 +75,20 @@ def scrape_browse_pages():
             if new_ids is not None:
                 print(page_num, end='')
                 yield new_ids
-                sleep(WAIT_TIME)
+                sleep(wait_time)
                 continue
 
         print(f'\nFinished on page {page_num}.')
         break
 
 
-def main(destination_path: Path) -> None:
+def main(destination_path: Path, max_pages: int = 250) -> None:
     """Run scraper and save output to csv
 
     Args:
         destination_path (Path): file to write output to
+        max_pages (int): Max number of pages to parse
     """
     with open(destination_path, 'w', encoding='utf-8') as file:
-        for id_list in scrape_browse_pages():
+        for id_list in scrape_browse_pages(max_pages=max_pages):
             file.writelines([str(line) + "\n" for line in id_list])
