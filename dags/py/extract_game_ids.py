@@ -1,22 +1,21 @@
 """Extract game IDs for all ranked games on BoardGameGeek.com"""
 
 import re
+from os import getenv
 from time import sleep
 from pathlib import Path
 from typing import Generator
 import requests
 from bs4 import BeautifulSoup
-from dotenv import dotenv_values
 
 
 def authenticate() -> requests.Session:
     """Create authenticated Requests session with BGG.com"""
     login_url = 'https://boardgamegeek.com/login/api/v1'
-    env_vars = dotenv_values('.env')
     creds = {
         "credentials": {
-            "username": env_vars['BGG_USERNAME'],
-            "password": env_vars['BGG_PASSWORD']
+            "username": getenv('BGG_USERNAME'),
+            "password": getenv('BGG_PASSWORD')
             }
     }
 
