@@ -4,6 +4,8 @@ on: [push]
 
 env:
   PIPENV_VENV_IN_PROJECT: enabled
+  BGG_USERNAME: ${{ secrets.BGG_USERNAME }}
+  BGG_PASSWORD: ${{ secrets.BGG_PASSWORD }}
 
 permissions:
   contents: read
