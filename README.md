@@ -2,6 +2,8 @@
 
 [![Flake8](https://github.com/boardgameanalytics/bga-pipeline/actions/workflows/flake8.yml/badge.svg)](https://github.com/boardgameanalytics/bga-pipeline/actions/workflows/flake8.yml)
 [![Pytests](https://github.com/boardgameanalytics/bga-pipeline/actions/workflows/pytest.yml/badge.svg)](https://github.com/boardgameanalytics/bga-pipeline/actions/workflows/pytest.yml)
+[![Python Version](https://img.shields.io/badge/Python-3.9-green.svg)](https://shields.io/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A fully automated ETL pipeline using Apache Airflow, BeautifulSoup4, Pandas, and Postgres to create a data warehouse of board game data from [BoardGameGeek.com](https://boardgamegeek.com/) using their [BGGXMLAPI2](https://boardgamegeek.com/wiki/page/BGG_XML_API2).
 
