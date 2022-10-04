@@ -4,7 +4,7 @@ import re
 from os import getenv
 from time import sleep
 from pathlib import Path
-from typing import Generator
+from typing import Generator, List
 from requests import Session
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
@@ -55,7 +55,7 @@ def extract_ranked_game_ids(text: str) -> list:
     return id_list
 
 
-def scrape_browse_pages(max_pages: int, wait_time: int = 5) -> Generator:
+def scrape_browse_pages(max_pages: int, wait_time: int = 5) -> Generator[List[str], None, None]:
     """Extract game ids of all ranked games on BGG
 
     Returns:
