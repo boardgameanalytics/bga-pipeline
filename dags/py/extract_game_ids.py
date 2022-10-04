@@ -5,12 +5,12 @@ from os import getenv
 from time import sleep
 from pathlib import Path
 from typing import Generator
-import requests
+from requests import Session
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 
 
-def authenticate() -> requests.Session:
+def authenticate() -> Session:
     """Create authenticated Requests session with BGG.com"""
     load_dotenv()
     login_url = 'https://boardgamegeek.com/login/api/v1'
@@ -21,7 +21,7 @@ def authenticate() -> requests.Session:
             }
     }
 
-    session = requests.Session()
+    session = Session()
     res = session.post(login_url, json=creds)
     if res.status_code == 204:
         return session

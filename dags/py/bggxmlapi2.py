@@ -1,6 +1,6 @@
 """Helper functions for using the BGGXMLAPI2"""
 
-import requests
+from requests import get
 
 
 def build_query(query_type: str, params: dict) -> str:
@@ -31,4 +31,4 @@ def fetch_game(game_id: str) -> str:
         'id': game_id
     }
     request_url = build_query('thing', params)
-    return requests.get(url=request_url).content.decode()
+    return get(url=request_url).content.decode()

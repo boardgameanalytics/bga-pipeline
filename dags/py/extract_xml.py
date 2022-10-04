@@ -17,7 +17,7 @@ def save_file(path: Path, content: str) -> bool:
     return path.exists()
 
 
-def scrape_game_pages(game_ids_list: list, batch_size: int) -> Generator:
+def scrape_game_pages(game_ids_list: list, batch_size: int) -> Generator[str]:
     """Fetch, save, and extract data from game pages
 
     Args:

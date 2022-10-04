@@ -2,13 +2,13 @@
 
 import re
 from pathlib import Path
-import pandas as pd
+from pandas import DataFrame, concat
 from bs4 import BeautifulSoup
 
 CLASS_TYPES = ['mechanic', 'category', 'designer', 'artist', 'publisher']
 
 
-def transform_game_data(game_soup: BeautifulSoup) -> pd.DataFrame:
+def transform_game_data(game_soup: BeautifulSoup) -> DataFrame:
     """Transform game data from XML fragment to Pandas DataFrame
 
     Args:
@@ -36,10 +36,10 @@ def transform_game_data(game_soup: BeautifulSoup) -> pd.DataFrame:
         'kickstarter': [bool(game_soup.find('link', id='8374'))]
     }
 
-    return pd.DataFrame.from_dict(raw)
+    return DataFrame.from_dict(raw)
 
 
-def transform_game_description(game_soup: BeautifulSoup) -> pd.DataFrame:
+def transform_game_description(game_soup: BeautifulSoup) -> DataFrame:
     """Transform game descriptions to Pandas DataFrame
 
     Args:
@@ -59,10 +59,10 @@ def transform_game_description(game_soup: BeautifulSoup) -> pd.DataFrame:
         'description': [desc]
     }
 
-    return pd.DataFrame.from_dict(raw)
+    return DataFrame.from_dict(raw)
 
 
-def transform_game_classification(name: str, game_soup: BeautifulSoup) -> pd.DataFrame:
+def transform_game_classification(name: str, game_soup: BeautifulSoup) -> DataFrame:
     """Transform given classification ids from game's XML fragment to Pandas DataFrame
 
     Args:
@@ -75,10 +75,10 @@ def transform_game_classification(name: str, game_soup: BeautifulSoup) -> pd.Dat
     raw = [(int(line.attrs['id']), str(line.attrs['value']))
            for line in game_soup.find_all('link', type=f'boardgame{name}')]
 
-    return pd.DataFrame.from_records(raw, columns=['id', 'name'])
+    return DataFrame.from_records(raw, columns=['id', 'name'])
 
 
-def transform_class_map(name: str, game_soup: BeautifulSoup) -> pd.DataFrame:
+def transform_class_map(name: str, game_soup: BeautifulSoup) -> DataFrame:
     """Create mapping of game classifications
 
     Args:
@@ -90,10 +90,10 @@ def transform_class_map(name: str, game_soup: BeautifulSoup) -> pd.DataFrame:
     """
     raw = [(int(game_soup.attrs['id']), int(line.attrs['id']))
            for line in game_soup.find_all('link', type=f'boardgame{name}')]
-    return pd.DataFrame.from_records(raw, columns=['game_id', f'{name}_id'])
+    return DataFrame.from_records(raw, columns=['game_id', f'{name}_id'])
 
 
-def save_df(dataframe: pd.DataFrame, destination_path: Path) -> None:
+def save_df(dataframe: DataFrame, destination_path: Path) -> None:
     """Save DataFrame to csv file"""
     with open(destination_path, 'w', encoding='utf-8') as file:
         dataframe.to_csv(file, index=False)
@@ -120,11 +120,11 @@ def main(xml_dir: Path, csv_dir: Path) -> None:
                 for name, data in class_maps.items():
                     data.append(transform_class_map(name, game_soup))
 
-    save_df(pd.concat(games).drop_duplicates(), csv_dir / 'game.csv')
-    save_df(pd.concat(game_desc).drop_duplicates(), csv_dir / 'game_description.csv')
+    save_df(concat(games).drop_duplicates(), csv_dir / 'game.csv')
+    save_df(concat(game_desc).drop_duplicates(), csv_dir / 'game_description.csv')
 
     for name, dfs in classifications.items():
-        save_df(pd.concat(dfs).drop_duplicates(), csv_dir / f'{name}.csv')
+        save_df(concat(dfs).drop_duplicates(), csv_dir / f'{name}.csv')
 
     for name, dfs in class_maps.items():
-        save_df(pd.concat(dfs).drop_duplicates(), csv_dir / f'game_{name}.csv')
+        save_df(concat(dfs).drop_duplicates(), csv_dir / f'game_{name}.csv')
