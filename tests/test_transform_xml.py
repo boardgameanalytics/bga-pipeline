@@ -1,12 +1,12 @@
 from pathlib import Path
 import pandas as pd
 from bs4 import BeautifulSoup
-from dags.py.transform_xml import transform_game_data
-from dags.py.transform_xml import transform_game_description
-from dags.py.transform_xml import transform_game_classification
-from dags.py.transform_xml import transform_class_map
-from dags.py.transform_xml import save_df
-from dags.py.transform_xml import main
+from dags.py_modules.transform_xml import transform_game_data
+from dags.py_modules.transform_xml import transform_game_description
+from dags.py_modules.transform_xml import transform_game_classification
+from dags.py_modules.transform_xml import transform_class_map
+from dags.py_modules.transform_xml import save_df
+from dags.py_modules.transform_xml import main
 
 
 def _setup_soup():

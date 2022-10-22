@@ -1,9 +1,9 @@
 from pathlib import Path
 from bs4 import BeautifulSoup
 from requests import Response
-from dags.py.extract_xml import save_file
-from dags.py.extract_xml import scrape_game_pages
-from dags.py.extract_xml import main
+from dags.py_modules.extract_xml import save_file
+from dags.py_modules.extract_xml import scrape_game_pages
+from dags.py_modules.extract_xml import main
 
 
 def test_save_file() -> None:

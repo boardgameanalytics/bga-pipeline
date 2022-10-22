@@ -10,10 +10,7 @@ from airflow.operators.sql import SQLValueCheckOperator
 from airflow.providers.http.sensors.http import HttpSensor
 from airflow.providers.postgres.operators.postgres import PostgresOperator
 from airflow.providers.postgres.hooks.postgres import PostgresHook
-from py import extract_game_ids
-from py import extract_xml
-from py import transform_xml
-from py import load
+from py_modules import extract_game_ids, extract_xml, transform_xml, load
 
 current_date = datetime.today().strftime('%Y-%m-%d')
 

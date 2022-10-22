@@ -1,9 +1,9 @@
 from pathlib import Path
 from requests import Session
-from dags.py.extract_game_ids import authenticate
-from dags.py.extract_game_ids import scrape_browse_pages
-from dags.py.extract_game_ids import extract_ranked_game_ids
-from dags.py.extract_game_ids import main
+from dags.py_modules.extract_game_ids import authenticate
+from dags.py_modules.extract_game_ids import scrape_browse_pages
+from dags.py_modules.extract_game_ids import extract_ranked_game_ids
+from dags.py_modules.extract_game_ids import main
 
 
 def test_authenticate():

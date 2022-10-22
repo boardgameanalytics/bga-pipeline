@@ -1,5 +1,5 @@
 import re
-from dags.py import bggxmlapi2
+from dags.py_modules import bggxmlapi2
 
 
 def test_build_query():
