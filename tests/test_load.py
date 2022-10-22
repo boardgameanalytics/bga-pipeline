@@ -1,7 +1,7 @@
 from pathlib import Path
 import sqlite3
 import pandas as pd
-from dags.py.load import load_table
+from dags.py_modules.load import load_table
 
 
 def test_load_table():
